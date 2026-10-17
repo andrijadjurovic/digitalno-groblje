@@ -1,0 +1,225 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="night" x2="0" y2="1">
+      <stop stop-color="#05090d" stop-opacity=".76"/>
+      <stop offset=".31" stop-color="#10171b" stop-opacity=".27"/>
+      <stop offset=".68" stop-color="#080b09" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#030504" stop-opacity=".81"/>
+    </linearGradient>
+    <radialGradient id="edgeShade">
+      <stop offset=".42" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".46"/>
+    </radialGradient>
+    <linearGradient id="doorWood" x1="0" y1=".2" x2="1" y2=".8">
+      <stop stop-color="#21170f"/>
+      <stop offset=".08" stop-color="#634428"/>
+      <stop offset=".2" stop-color="#392719"/>
+      <stop offset=".35" stop-color="#765231"/>
+      <stop offset=".48" stop-color="#302116"/>
+      <stop offset=".62" stop-color="#69472a"/>
+      <stop offset=".78" stop-color="#392719"/>
+      <stop offset=".91" stop-color="#68462a"/>
+      <stop offset="1" stop-color="#21170f"/>
+    </linearGradient>
+    <linearGradient id="doorLight" x1="0" x2="1" y2=".1">
+      <stop stop-color="#1a120c" stop-opacity=".74"/>
+      <stop offset=".12" stop-color="#d1a66a" stop-opacity=".13"/>
+      <stop offset=".48" stop-color="#f1cc8a" stop-opacity=".03"/>
+      <stop offset=".5" stop-color="#050403" stop-opacity=".59"/>
+      <stop offset=".53" stop-color="#d0a064" stop-opacity=".17"/>
+      <stop offset=".88" stop-color="#d1a66a" stop-opacity=".07"/>
+      <stop offset="1" stop-color="#130d08" stop-opacity=".82"/>
+    </linearGradient>
+    <linearGradient id="iron" x2="1">
+      <stop stop-color="#171512"/>
+      <stop offset=".24" stop-color="#a0875c"/>
+      <stop offset=".4" stop-color="#30271b"/>
+      <stop offset=".67" stop-color="#756044"/>
+      <stop offset="1" stop-color="#181613"/>
+    </linearGradient>
+    <linearGradient id="boardWood" x1="0" x2="1" y2=".7">
+      <stop stop-color="#24231d"/>
+      <stop offset=".17" stop-color="#514b3d"/>
+      <stop offset=".45" stop-color="#39372e"/>
+      <stop offset=".72" stop-color="#514b3e"/>
+      <stop offset="1" stop-color="#24231d"/>
+    </linearGradient>
+    <linearGradient id="stone" x1="0" x2="1" y2=".7">
+      <stop stop-color="#292d29"/>
+      <stop offset=".2" stop-color="#5d6058"/>
+      <stop offset=".48" stop-color="#454941"/>
+      <stop offset=".72" stop-color="#69695f"/>
+      <stop offset="1" stop-color="#292d29"/>
+    </linearGradient>
+    <linearGradient id="stoneFace" x1="0" x2="1" y2="1">
+      <stop stop-color="#73746b"/>
+      <stop offset=".18" stop-color="#4c5049"/>
+      <stop offset=".5" stop-color="#606259"/>
+      <stop offset=".82" stop-color="#41453f"/>
+      <stop offset="1" stop-color="#282c28"/>
+    </linearGradient>
+    <linearGradient id="markerLimestone" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#a5a294"/>
+      <stop offset=".18" stop-color="#8b897e"/>
+      <stop offset=".52" stop-color="#77766d"/>
+      <stop offset=".8" stop-color="#64645d"/>
+      <stop offset="1" stop-color="#454740"/>
+    </linearGradient>
+    <linearGradient id="markerEdge" x1="0" x2="1">
+      <stop stop-color="#3b3e38"/>
+      <stop offset=".25" stop-color="#66675e"/>
+      <stop offset="1" stop-color="#343831"/>
+    </linearGradient>
+    <linearGradient id="gold" x2="0" y2="1">
+      <stop stop-color="#f0d69c"/>
+      <stop offset=".35" stop-color="#b68b49"/>
+      <stop offset=".7" stop-color="#e2c17c"/>
+      <stop offset="1" stop-color="#72522c"/>
+    </linearGradient>
+    <pattern id="planks" width="58" height="240" patternUnits="userSpaceOnUse">
+      <rect width="58" height="240" fill="url(#doorWood)"/>
+      <path d="M2 0V240M54 0V240" stroke="#130d08" stroke-opacity=".63" stroke-width="3"/>
+      <path d="M6 0V240M51 0V240" stroke="#d5a66b" stroke-opacity=".18" stroke-width="2"/>
+      <path d="M15 0c-3 36 4 53 0 84s2 59-1 89 2 42 0 67M38 2c2 32-3 46 1 77s-3 68 1 91-2 41 1 66" fill="none" stroke="#170f09" stroke-opacity=".3" stroke-width="1.4"/>
+      <path d="M24 7c1 24-2 42 0 59M45 128c-1 23 2 39 0 70" fill="none" stroke="#d5ad77" stroke-opacity=".12"/>
+      <ellipse cx="30" cy="59" rx="2" ry="5" fill="#180f08" opacity=".55"/>
+      <ellipse cx="17" cy="192" rx="1.7" ry="4" fill="#e1bb81" opacity=".2"/>
+    </pattern>
+    <pattern id="woodLines" width="110" height="47" patternUnits="userSpaceOnUse">
+      <path d="M0 7c20-3 38 4 61 1s34-3 49 0M-8 28c26 5 43-3 64 0s36 6 58 0M15 42c22-3 36 2 53-1" fill="none" stroke="#c59256" stroke-opacity=".13" stroke-width="1"/>
+      <path d="M6 13c25 1 40-3 57 0M67 34c13-2 23 1 36-2" fill="none" stroke="#140d08" stroke-opacity=".25" stroke-width="1.4"/>
+    </pattern>
+    <filter id="grain" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".53" numOctaves="3" seed="8" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 .15"/>
+      </feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="13" result="blur"/>
+      <feOffset dy="13" result="offset"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".66"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="stoneTexture" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency=".025" numOctaves="3" seed="13" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 .22"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+    <filter id="markerTexture" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="3" seed="31" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0"/>
+      <feComponentTransfer><feFuncA type="table" tableValues="0 .2"/></feComponentTransfer>
+      <feBlend in="SourceGraphic" mode="soft-light"/>
+    </filter>
+    <clipPath id="doorShape">
+      <path d="M642 1085V775a318 318 0 0 1 636 0v310Z"/>
+    </clipPath>
+    <clipPath id="leftDoor">
+      <path d="M642 1085V775a318 318 0 0 1 318-318v628Z"/>
+    </clipPath>
+    <clipPath id="rightDoor">
+      <path d="M960 457a318 318 0 0 1 318 318v310H960Z"/>
+    </clipPath>
+    <clipPath id="boardShape">
+      <path d="M278 662 520 674v207l-242-17Z"/>
+    </clipPath>
+    <clipPath id="markerShape">
+      <path d="M1594 875V635c0-58 62-98 125-98s126 40 126 98v240Z"/>
+    </clipPath>
+  </defs>
+
+  <g id="cemetery-gates" display="none" filter="url(#softShadow)">
+    <path d="M632 1088V775a328 328 0 0 1 656 0v313Z" fill="#13100c" opacity=".94"/>
+    <path d="M648 1082V775a312 312 0 0 1 624 0v307Z" fill="url(#doorWood)" stroke="#19130d" stroke-width="9"/>
+    <g clip-path="url(#doorShape)">
+      <rect x="635" y="450" width="650" height="640" fill="url(#planks)"/>
+      <rect x="635" y="450" width="650" height="640" fill="url(#woodLines)"/>
+      <rect x="635" y="450" width="650" height="640" fill="url(#doorLight)"/>
+      <path d="M958 461v620" stroke="#0d0a07" stroke-width="13" opacity=".88"/>
+      <path d="M968 463v618" stroke="#d9b37a" stroke-width="2" opacity=".22"/>
+      <path d="M667 760Q960 440 1253 760" fill="none" stroke="#d2a865" stroke-width="5" opacity=".47"/>
+      <path d="M654 783Q960 471 1266 783" fill="none" stroke="#0e0c09" stroke-width="10" opacity=".85"/>
+      <path d="M652 823Q960 520 1268 823M650 1041h620" fill="none" stroke="#18120c" stroke-width="18" opacity=".79"/>
+      <path d="M652 816Q960 513 1268 816M650 1032h620" fill="none" stroke="url(#iron)" stroke-width="8"/>
+      <path d="M652 828Q960 525 1268 828M650 1050h620" fill="none" stroke="#bc9a63" stroke-width="1.5" opacity=".55"/>
+      <g fill="url(#iron)" stroke="#18140e" stroke-width="2">
+        <path d="M700 767v310h15V754Z"/><path d="M748 720v357h14V709Z"/>
+        <path d="M800 677v400h13V669Z"/><path d="M853 634v443h13V627Z"/>
+        <path d="M907 587v490h13V581Z"/><path d="M960 466v611h13V466Z"/>
+        <path d="M1006 581v496h13V587Z"/><path d="M1060 627v450h13V634Z"/>
+        <path d="M1113 669v408h13V677Z"/><path d="M1164 709v368h14V720Z"/>
+        <path d="M1210 754v323h15V767Z"/>
+      </g>
+      <g fill="url(#gold)" stroke="#302315" stroke-width="3">
+        <circle cx="710" cy="845" r="7"/><circle cx="758" cy="803" r="7"/>
+        <circle cx="810" cy="757" r="7"/><circle cx="860" cy="711" r="7"/>
+        <circle cx="914" cy="659" r="7"/><circle cx="966" cy="555" r="7"/>
+        <circle cx="1012" cy="659" r="7"/><circle cx="1066" cy="711" r="7"/>
+        <circle cx="1119" cy="757" r="7"/><circle cx="1171" cy="803" r="7"/>
+        <circle cx="1218" cy="845" r="7"/>
+        <circle cx="710" cy="1032" r="8"/><circle cx="758" cy="1032" r="8"/>
+        <circle cx="810" cy="1032" r="8"/><circle cx="860" cy="1032" r="8"/>
+        <circle cx="914" cy="1032" r="8"/><circle cx="966" cy="1032" r="8"/>
+        <circle cx="1012" cy="1032" r="8"/><circle cx="1066" cy="1032" r="8"/>
+        <circle cx="1119" cy="1032" r="8"/><circle cx="1171" cy="1032" r="8"/>
+        <circle cx="1218" cy="1032" r="8"/>
+      </g>
+      <path d="M940 867h-167l7 88h160Zm40 0h167l-7 88H980Z" fill="#20170e" stroke="url(#gold)" stroke-width="4"/>
+      <path d="M940 873H782v76h158Zm40 0h158v76H980Z" fill="url(#boardWood)" stroke="#49361f" stroke-width="2"/>
+      <text x="960" y="921" fill="url(#gold)" text-anchor="middle" font-family="Georgia,serif" font-size="27" font-weight="bold">Groblje</text>
+      <g fill="#c9a15b">
+        <circle cx="790" cy="880" r="4"/><circle cx="950" cy="880" r="4"/>
+        <circle cx="990" cy="880" r="4"/><circle cx="1150" cy="880" r="4"/>
+      </g>
+    </g>
+    <path d="M642 1083V775a318 318 0 0 1 636 0v308" fill="none" stroke="#17130f" stroke-width="15"/>
+    <path d="M651 1080V776a309 309 0 0 1 618 0v304" fill="none" stroke="#b7a17b" stroke-opacity=".45" stroke-width="3"/>
+    <path d="M662 1081V778a298 298 0 0 1 596 0v303" fill="none" stroke="#0d0c09" stroke-opacity=".72" stroke-width="4"/>
+    <path d="M960 464v615" stroke="#0e0b08" stroke-width="16" opacity=".92"/>
+    <path d="M951 468v606" stroke="#bb9452" stroke-width="2" opacity=".42"/>
+    <path d="M969 468v606" stroke="#070605" stroke-width="2" opacity=".78"/>
+    <g fill="url(#gold)" stroke="#21180e" stroke-width="4">
+      <circle cx="941" cy="912" r="11"/><circle cx="979" cy="912" r="11"/>
+    </g>
+    <g fill="#1c160e">
+      <circle cx="941" cy="912" r="4"/><circle cx="979" cy="912" r="4"/>
+    </g>
+  </g>
+
+  <g id="wall-board" transform="translate(0 117) scale(.85)">
+    <path d="m278 674-44-4-2 17 43 9Zm-2 118-45-2-2 17 45 8Z" fill="#080a09" opacity=".7" transform="translate(-5 8)"/>
+    <path d="m278 674-44-4-2 17 43 9Zm-2 118-45-2-2 17 45 8Z" fill="url(#iron)" stroke="#272923" stroke-width="4"/>
+    <path d="m241 668-17-2-2 22 17 3Zm-2 119-18-2-1 22 18 3Z" fill="#4d4a3f" stroke="#252720" stroke-width="3"/>
+    <g fill="#1c1d18" stroke="#898575" stroke-opacity=".5" stroke-width="2">
+      <circle cx="230" cy="678" r="4"/><circle cx="229" cy="798" r="4"/>
+    </g>
+    <path d="m268 658 265 11 4 175-265-14Z" fill="#050706" opacity=".58" transform="translate(8 13)"/>
+    <path d="m268 658 265 11 4 175-265-14Z" fill="url(#stone)" stroke="#292c27" stroke-width="7"/>
+    <path d="m275 664 250 11 3 160-250-13Z" fill="url(#markerLimestone)" stroke="#484a42" stroke-opacity=".78" stroke-width="2"/>
+    <path d="m282 671 235 10 2 145-235-12Z" fill="url(#stoneFace)" filter="url(#markerTexture)" stroke="#42453e" stroke-width="4"/>
+    <path d="m287 676 225 9 1 135-225-12Z" fill="none" stroke="#bab6a8" stroke-opacity=".27" stroke-width="1"/>
+    <path d="m301 690 26 1m12 1 17 1m-51 124 19 1m154 7 26 1" stroke="#252923" stroke-opacity=".34" stroke-width="2"/>
+    <path d="m298 691 20 1m174 132 20 1m-224-139 8 2m210 130 8 2" stroke="#d1cbbb" stroke-opacity=".2" stroke-width="1.5"/>
+    <g fill="#24251f" stroke="#9a9582" stroke-opacity=".48" stroke-width="2">
+      <circle cx="281" cy="672" r="4.5"/><circle cx="518" cy="682" r="4.5"/>
+      <circle cx="283" cy="817" r="4.5"/><circle cx="520" cy="826" r="4.5"/>
+    </g>
+    <g fill="#242720" font-family="Georgia,serif" text-anchor="middle" letter-spacing=".4" font-weight="bold">
+      <text x="398" y="741" font-size="26">Oglasna</text>
+      <text x="398" y="775" font-size="26">tabla</text>
+    </g>
+    <g fill="#c9c4b3" fill-opacity=".95" stroke="#45473f" stroke-opacity=".8" stroke-width=".7" paint-order="stroke" font-family="Georgia,serif" text-anchor="middle" letter-spacing=".4" font-weight="bold">
+      <text x="398" y="738" font-size="26">Oglasna</text>
+      <text x="398" y="772" font-size="26">tabla</text>
+    </g>
+    <g fill="#d4cdbc" fill-opacity=".29" font-family="Georgia,serif" text-anchor="middle" letter-spacing=".4" font-weight="bold">
+      <text x="397" y="737" font-size="26">Oglasna</text>
+      <text x="397" y="771" font-size="26">tabla</text>
+    </g>
+  </g>
+
+</svg>

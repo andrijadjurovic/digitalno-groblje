@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="480" viewBox="0 0 320 480" fill="none">
+  <defs>
+    <linearGradient id="drop" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#b9d0dd" stop-opacity=".08"/>
+      <stop offset=".48" stop-color="#ecf5f8" stop-opacity=".38"/>
+      <stop offset="1" stop-color="#a7c1d0" stop-opacity=".08"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f5fafb" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#e3edf2" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#drop)">
+    <path d="m30 27-1 6-2 5v3a2.5 3.5 0 0 0 5 0c0-2-1-4-2-8Z"/>
+    <path d="m94 81-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+    <path d="m243 49-1 6-2 5v3a2.5 3.5 0 0 0 5 0c0-2-1-4-2-8Z"/>
+    <path d="m176 131-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+    <path d="m47 196-1 6-2 5v3a2.5 3.5 0 0 0 5 0c0-2-1-4-2-8Z"/>
+    <path d="m291 222-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+    <path d="m128 264-1 6-2 5v3a2.5 3.5 0 0 0 5 0c0-2-1-4-2-8Z"/>
+    <path d="m222 313-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+    <path d="m17 346-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+    <path d="m77 421-1 6-2 5v3a2.5 3.5 0 0 0 5 0c0-2-1-4-2-8Z"/>
+    <path d="m272 390-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+    <path d="m310 462-1 5-2 4v2.5a2 3 0 0 0 4 0c0-1.5-.5-3-1-5.5Z"/>
+  </g>
+  <g fill="url(#shine)" opacity=".75">
+    <ellipse cx="29" cy="39" rx=".65" ry="2"/>
+    <ellipse cx="93" cy="92" rx=".55" ry="1.7"/>
+    <ellipse cx="242" cy="61" rx=".65" ry="2"/>
+    <ellipse cx="175" cy="142" rx=".55" ry="1.7"/>
+    <ellipse cx="46" cy="208" rx=".65" ry="2"/>
+    <ellipse cx="290" cy="233" rx=".55" ry="1.7"/>
+    <ellipse cx="127" cy="276" rx=".65" ry="2"/>
+    <ellipse cx="221" cy="324" rx=".55" ry="1.7"/>
+    <ellipse cx="16" cy="357" rx=".55" ry="1.7"/>
+    <ellipse cx="76" cy="434" rx=".65" ry="2"/>
+    <ellipse cx="271" cy="401" rx=".55" ry="1.7"/>
+    <ellipse cx="309" cy="473" rx=".55" ry="1.7"/>
+  </g>
+  <g fill="#e6f0f5" opacity=".1">
+    <ellipse cx="30" cy="39" rx="2.5" ry="4.5"/>
+    <ellipse cx="243" cy="61" rx="2.5" ry="4.5"/>
+    <ellipse cx="47" cy="208" rx="2.5" ry="4.5"/>
+    <ellipse cx="128" cy="276" rx="2.5" ry="4.5"/>
+    <ellipse cx="77" cy="434" rx="2.5" ry="4.5"/>
+  </g>
+</svg>
