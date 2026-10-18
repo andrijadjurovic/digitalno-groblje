@@ -29,7 +29,7 @@ The current seven sample memorials are defined in the app; Firestore stores thei
 
 You do not need to create the `memorialOfferings` collection or its `items` subcollections manually. Firestore creates them on the first successful gift save; until then, missing documents and empty subcollections are expected. If the app reports `permission-denied`, enable Anonymous sign-in and publish `firestore.rules` to the same Firebase project configured in `.env.local`, then reload the app. The `memorialGalleries` document is created by the first successful gallery upload.
 
-The optional ambient soundtrack is generated in the browser with the Web Audio API as softly decaying piano notes with a subtle filtered nature ambience and occasional bird-like chirps; it starts only after the visitor selects the sound button and can be muted there at any time.
+The ambient soundtrack is generated in the browser with the Web Audio API as softly decaying piano notes with a subtle filtered nature ambience and occasional bird-like chirps. The app attempts to start it automatically; if the browser blocks autoplay, it starts on the visitor's first interaction with the page. The sound button can mute or enable it at any time.
 
 ### Cloudflare R2 gallery setup
 

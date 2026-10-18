@@ -7,7 +7,7 @@ import { collection, doc, increment, onSnapshot, runTransaction, serverTimestamp
 import { getFirebaseServices } from "../lib/firebase";
 import styles from "./page.module.css";
 
-type Place = "kapija" | "tabla" | "groblje";
+type Place = "kapija" | "tabla" | "groblje" | "about" | "terms" | "pricelist" | "contact";
 type Panel = "search" | "create" | "store" | "weather" | null;
 type TimeOfDay = "day" | "night";
 type Weather = "sunny" | "rain" | "snow" | "storm";
@@ -134,6 +134,72 @@ const places: { id: Place; label: string }[] = [
   { id: "kapija", label: "Kapija" },
   { id: "tabla", label: "Oglasna tabla" },
   { id: "groblje", label: "Groblje" },
+];
+
+const aboutSections = [
+  {
+    title: "Uspomene zaslužuju svoje mjesto",
+    text: "Digitalno groblje je prostor za čuvanje priča o ljudima koji su obilježili naše živote. Ime, fotografije, datumi i riječi sjećanja mogu pomoći porodici i prijateljima da uspomenu sačuvaju i podijele s drugima.",
+  },
+  {
+    title: "Digitalni pomen",
+    text: "Svaki pomen može sadržati osnovne podatke, posvetu i fotografije. Posjetioci mogu ostaviti digitalnu svijeću ili cvijeće kao znak pažnje. To je virtuelni način iskazivanja sjećanja i ne zamjenjuje lični pomen ili posjetu grobu.",
+  },
+  {
+    title: "Zajednica s poštovanjem",
+    text: "Ovaj prostor je namijenjen dostojanstvenom sjećanju. Molimo da objavljujete samo podatke i fotografije koje imate pravo da podijelite, i da ne unosite lične podatke živih osoba bez njihove saglasnosti. Sadržaj koji ugrožava privatnost ili vrijeđa druge može biti uklonjen.",
+  },
+  {
+    title: "Pažljivo čuvanje podataka",
+    text: "Uspomene su važne, zato ih treba unositi pažljivo i provjeriti prije objave. Digitalna usluga ne može garantovati čuvanje sadržaja zauvijek; dostupnost zavisi od rada sajta, njegovih dobavljača i održavanja.",
+  },
+  {
+    title: "Razvoj i dostupnost",
+    text: "Digitalno groblje se razvija korak po korak. Prikazane cijene i prodavnica trenutno su probni prikaz: naručivanje i naplata još nijesu aktivni. Forum i druge dodatne mogućnosti nijesu dostupni dok ih ne uvedemo i jasno objavimo.",
+  },
+];
+
+const termsSections = [
+  {
+    title: "Predmet i status usluge",
+    text: "Digitalno groblje je veb-prostor namijenjen čuvanju i dijeljenju uspomena. Sajt se trenutno razvija i pojedine funkcije rade u probnom režimu. Sadržaj unijet tokom testiranja može biti izmijenjen ili uklonjen, zato ga nemojte smatrati trajno arhiviranim.",
+  },
+  {
+    title: "Pružalac usluge i kontakt",
+    text: "Prije komercijalnog pokretanja ovdje će biti objavljeni puni naziv registrovanog poslovnog subjekta, sjedište, registracioni i poreski podaci, kao i kontakt za reklamacije. Za sada se možete obratiti na djurovicandrija21@gmail.com.",
+  },
+  {
+    title: "Sadržaj pomena i odgovornost korisnika",
+    text: "Korisnik je odgovoran za tačnost podataka i za to da ima pravo da postavi tekst, fotografiju ili drugi sadržaj. Ne objavljujte tuđe privatne podatke ili fotografije bez odgovarajućeg osnova i saglasnosti. Posebno vodite računa o podacima živih osoba i maloljetnika.",
+  },
+  {
+    title: "Dozvola za prikaz i autorska prava",
+    text: "Postavljanjem sadržaja potvrđujete da smijete da ga podijelite i dajete sajtu ograničeno pravo da ga čuva, prikazuje i tehnički obrađuje samo radi pružanja i održavanja funkcija pomena. Autorska prava ostaju nosiocu. Dozvolu možete povući zahtjevom za uklanjanje, uz razumne rokove potrebne za obradu kopija i rezervnih sistema.",
+  },
+  {
+    title: "Zabranjeni sadržaj i prijava",
+    text: "Nije dozvoljen nezakonit, prijeteći, uznemiravajući, obmanjujući ili tuđa prava povređujući sadržaj, niti zloupotreba sajta. Ako uočite problem, pošaljite nam vezu i opis na kontakt adresu. Sadržaj možemo privremeno ograničiti ili ukloniti kada je to potrebno radi zaštite ljudi, prava ili bezbjednosti, uz poštovanje važećih propisa.",
+  },
+  {
+    title: "Dostupnost i čuvanje podataka",
+    text: "Ulažemo napor da sajt bude dostupan i da podaci budu zaštićeni, ali probni servis može imati prekide, greške ili izmjene. Ne obećavamo trajno čuvanje niti neprekidnu dostupnost; sačuvajte sopstvene kopije važnih fotografija i tekstova. Zahtjev za ispravku ili uklanjanje možete poslati na kontakt adresu.",
+  },
+  {
+    title: "Cijene, pokloni i plaćanje",
+    text: "Prodavnica i prikazane cijene trenutno su demonstracioni prikaz. Naručivanje, kartična naplata i uplata na račun nijesu aktivni; izbor u probnoj verziji ne predstavlja plaćenu narudžbu. Ako se plaćene usluge uvedu, prije potvrde biće prikazani konačna cijena, trajanje, način plaćanja, uslovi otkazivanja i povraćaja, kao i podaci pružaoca usluge. Obavezna prava potrošača ostaju neizmijenjena.",
+  },
+  {
+    title: "Privatnost, izmjene i mjerodavno pravo",
+    text: "Lični podaci obrađuju se radi rada sajta i njegovih funkcija; detalji o kategorijama podataka, rokovima čuvanja i pravima korisnika treba da budu navedeni u posebnom obavještenju o privatnosti. Uslove možemo ažurirati uz objavu nove verzije. Na odnos se primjenjuju propisi Crne Gore, uz obavezna prava koja korisniku pripadaju po zakonu.",
+  },
+];
+
+const contactAddress = "djurovicandrija21@gmail.com";
+
+const priceListRows = [
+  { service: "Digitalni poklon uz pomen", period: "30 dana", price: "€ 2" },
+  { service: "Digitalni poklon uz pomen", period: "60 dana", price: "€ 3" },
+  { service: "Digitalni poklon uz pomen", period: "Zauvijek", price: "€ 10" },
 ];
 
 const storeCategories: { id: StoreCategory; label: string }[] = [
@@ -704,6 +770,8 @@ export default function Home() {
   const ambientGainRef = useRef<GainNode | null>(null);
   const ambientMusicTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const ambientSuspendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const ambientStartPromiseRef = useRef<Promise<boolean> | null>(null);
+  const gateSoundContextRef = useRef<AudioContext | null>(null);
   const [place, setPlace] = useState<Place>("kapija");
   const [enteringPlace, setEnteringPlace] = useState<"groblje" | null>(null);
   const [sceneArrived, setSceneArrived] = useState(false);
@@ -879,6 +947,13 @@ export default function Home() {
     setNotice("");
   }
 
+  function openInfoPage(nextPlace: "terms" | "pricelist" | "contact") {
+    setPlace(nextPlace);
+    setPanel(null);
+    setSelected(null);
+    setNotice("");
+  }
+
   function reportFirestoreListenerError(context: string, error: unknown) {
     const code = typeof error === "object" && error !== null && "code" in error && typeof error.code === "string"
       ? error.code
@@ -892,30 +967,13 @@ export default function Home() {
     setNotice(`${context} ${describeFirebaseError(error)}`);
   }
 
-  async function toggleAmbientMusic() {
-    if (!isMuted) {
-      const context = ambientAudioContextRef.current;
-      try {
-        if (context?.state === "running") {
-          ambientGainRef.current?.gain.setTargetAtTime(0.0001, context.currentTime, 0.12);
-          if (ambientSuspendTimerRef.current) clearTimeout(ambientSuspendTimerRef.current);
-          ambientSuspendTimerRef.current = setTimeout(() => {
-            ambientSuspendTimerRef.current = null;
-            if (context.state === "running") void context.suspend();
-          }, 600);
-        }
-        setIsMuted(true);
-      } catch (error) {
-        setNotice(`Ambijentalna muzika nije mogla da se zaustavi. ${error instanceof Error ? error.message : String(error)}`);
-      }
-      return;
-    }
-
-    try {
+  async function startAmbientMusic(autoplayAttempt: boolean): Promise<boolean> {
+    if (ambientStartPromiseRef.current) return ambientStartPromiseRef.current;
+    const startPromise = (async () => {
       const AudioContextConstructor = window.AudioContext;
       if (!AudioContextConstructor) {
-        setNotice("Ovaj pregledač ne podržava ambijentalnu muziku.");
-        return;
+        if (!autoplayAttempt) setNotice("Ovaj pregledač ne podržava ambijentalnu muziku.");
+        return false;
       }
 
       let context = ambientAudioContextRef.current;
@@ -969,11 +1027,110 @@ export default function Home() {
         clearTimeout(ambientSuspendTimerRef.current);
         ambientSuspendTimerRef.current = null;
       }
+      if (activeContext.state !== "running") {
+        if (!autoplayAttempt) setNotice("Pregledač nije dozvolio pokretanje zvuka. Pokušajte ponovo nakon interakcije sa stranicom.");
+        return false;
+      }
       ambientGainRef.current?.gain.setTargetAtTime(0.55, activeContext.currentTime, 1.2);
       setIsMuted(false);
       setNotice("");
+      return true;
+    })();
+    ambientStartPromiseRef.current = startPromise;
+    try {
+      return await startPromise;
     } catch (error) {
-      setNotice(`Ambijentalna muzika nije mogla da se pokrene. ${error instanceof Error ? error.message : String(error)}`);
+      const blockedByAutoplay = autoplayAttempt && error instanceof Error && error.name === "NotAllowedError";
+      if (!blockedByAutoplay) {
+        setNotice(`Ambijentalna muzika nije mogla da se pokrene. ${error instanceof Error ? error.message : String(error)}`);
+      }
+      return false;
+    } finally {
+      if (ambientStartPromiseRef.current === startPromise) ambientStartPromiseRef.current = null;
+    }
+  }
+
+  async function toggleAmbientMusic() {
+    if (!isMuted) {
+      const context = ambientAudioContextRef.current;
+      if (context?.state !== "running") {
+        await startAmbientMusic(false);
+        return;
+      }
+      try {
+        ambientGainRef.current?.gain.setTargetAtTime(0.0001, context.currentTime, 0.12);
+        if (ambientSuspendTimerRef.current) clearTimeout(ambientSuspendTimerRef.current);
+        ambientSuspendTimerRef.current = setTimeout(() => {
+          ambientSuspendTimerRef.current = null;
+          if (context.state === "running") void context.suspend();
+        }, 600);
+        setIsMuted(true);
+      } catch (error) {
+        setNotice(`Ambijentalna muzika nije mogla da se zaustavi. ${error instanceof Error ? error.message : String(error)}`);
+      }
+      return;
+    }
+
+    await startAmbientMusic(false);
+  }
+
+  async function playGateOpeningSound() {
+    try {
+      const AudioContextConstructor = window.AudioContext;
+      if (!AudioContextConstructor) {
+        setNotice("Ovaj pregledač ne podržava zvuk otvaranja kapije.");
+        return;
+      }
+
+      const context = new AudioContextConstructor();
+      gateSoundContextRef.current = context;
+      await context.resume();
+      if (context.state !== "running") {
+        setNotice("Pregledač nije dozvolio reprodukciju zvuka kapije.");
+        void context.close();
+        gateSoundContextRef.current = null;
+        return;
+      }
+
+      const now = context.currentTime;
+      const duration = 2.25;
+      const noiseBuffer = context.createBuffer(1, Math.ceil(context.sampleRate * duration), context.sampleRate);
+      const noise = noiseBuffer.getChannelData(0);
+      let previousSample = 0;
+      for (let index = 0; index < noise.length; index += 1) {
+        const pseudoRandom = Math.sin((index + now * context.sampleRate + 1) * 12.9898) * 43758.5453;
+        const whiteNoise = (pseudoRandom - Math.floor(pseudoRandom)) * 2 - 1;
+        previousSample = (whiteNoise + previousSample * 0.94) * 0.12;
+        noise[index] = previousSample;
+      }
+
+      const source = context.createBufferSource();
+      const filter = context.createBiquadFilter();
+      const creakGain = context.createGain();
+      source.buffer = noiseBuffer;
+      filter.type = "bandpass";
+      filter.frequency.setValueAtTime(360, now);
+      filter.frequency.linearRampToValueAtTime(185, now + 1.45);
+      filter.frequency.linearRampToValueAtTime(290, now + duration);
+      filter.Q.value = 1.25;
+      creakGain.gain.setValueAtTime(0.0001, now);
+      creakGain.gain.linearRampToValueAtTime(0.085, now + 0.35);
+      creakGain.gain.setValueAtTime(0.045, now + 1.25);
+      creakGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      source.connect(filter);
+      filter.connect(creakGain);
+      creakGain.connect(context.destination);
+      source.onended = () => {
+        if (gateSoundContextRef.current === context) gateSoundContextRef.current = null;
+        void context.close();
+      };
+      source.start(now);
+      source.stop(now + duration);
+    } catch (error) {
+      const context = gateSoundContextRef.current;
+      gateSoundContextRef.current = null;
+      if (context && context.state !== "closed") void context.close();
+      setNotice(`Zvuk otvaranja kapije nije mogao da se pusti. ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -994,6 +1151,7 @@ export default function Home() {
       return;
     }
 
+    void playGateOpeningSound();
     setEnteringPlace("groblje");
     entryTimerRef.current = setTimeout(() => {
       entryTimerRef.current = null;
@@ -1323,6 +1481,33 @@ export default function Home() {
     if (ambientSuspendTimerRef.current) clearTimeout(ambientSuspendTimerRef.current);
     const context = ambientAudioContextRef.current;
     if (context && context.state !== "closed") void context.close();
+    const gateContext = gateSoundContextRef.current;
+    if (gateContext && gateContext.state !== "closed") void gateContext.close();
+  }, []);
+
+  useEffect(() => {
+    const removeGestureListeners = () => {
+      window.removeEventListener("pointerdown", startOnGesture, true);
+      window.removeEventListener("keydown", startOnGesture, true);
+    };
+    const startOnGesture = () => {
+      void startAmbientMusic(false).then((started) => {
+        if (started) removeGestureListeners();
+      });
+    };
+
+    window.addEventListener("pointerdown", startOnGesture, true);
+    window.addEventListener("keydown", startOnGesture, true);
+    const autoplayTimer = window.setTimeout(() => {
+      void startAmbientMusic(true).then((started) => {
+        if (started) removeGestureListeners();
+      });
+    }, 0);
+
+    return () => {
+      window.clearTimeout(autoplayTimer);
+      removeGestureListeners();
+    };
   }, []);
 
   useEffect(() => {
@@ -1435,7 +1620,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main ref={worldRef} aria-busy={Boolean(enteringPlace)} className={`${styles.world} ${styles[`scene_${place}`]} ${styles[`time_${timeOfDay}`]} ${styles[`weather_${weather}`]} ${enteringPlace ? styles.gateOpening : ""} ${sceneArrived ? styles.sceneArrived : ""} ${panel === "create" ? styles.creatingMemorial : ""} ${panel === "store" ? styles.storeOpen : ""}`}>
+    <main ref={worldRef} aria-busy={Boolean(enteringPlace)} className={`${styles.world} ${styles[`scene_${place}`]} ${place === "about" || place === "terms" || place === "pricelist" || place === "contact" ? styles.infoPageScene : ""} ${styles[`time_${timeOfDay}`]} ${styles[`weather_${weather}`]} ${enteringPlace ? styles.gateOpening : ""} ${sceneArrived ? styles.sceneArrived : ""} ${panel === "create" ? styles.creatingMemorial : ""} ${panel === "store" ? styles.storeOpen : ""}`}>
       <div ref={gateCameraRef} className={`${styles.gateCamera} ${enteringPlace ? styles.gateCameraZooming : ""}`}>
         <div
           className={styles.backdrop}
@@ -1462,7 +1647,7 @@ export default function Home() {
             <div className={styles.interiorRevealScene} />
           </div>
         )}
-        {place === "kapija" && (
+        {(place === "kapija" || place === "about" || place === "terms" || place === "pricelist" || place === "contact") && (
           <div ref={gateDoorsRef} className={`${styles.gateDoors} ${enteringPlace ? styles.gateDoorsOpening : ""}`} aria-hidden="true">
             <div className={`${styles.gateDoorLeaf} ${styles.gateDoorLeft}`}>
               <Image src="/gate-door-left.png" alt="" fill sizes="10vw" loading="eager" draggable={false} />
@@ -1479,7 +1664,11 @@ export default function Home() {
       <header className={styles.header}>
         <a className={styles.brand} href="#kapija" onClick={(event) => { event.preventDefault(); showPlace("kapija"); }} aria-label="Digitalno groblje — kapija">
           <span className={styles.brandMark} aria-hidden="true">
-            <svg viewBox="0 0 48 48" role="img"><path d="M24 24c-2-5-10-14-16-10-5 3-1 13 9 13-7 3-6 9-2 10 4 1 7-7 9-12 2 5 5 13 9 12 4-1 5-7-2-10 10 0 14-10 9-13-6-4-14 5-16 10Zm0-3c-2-4-1-8 0-11 1 3 2 7 0 11Z" /></svg>
+            <svg viewBox="0 0 48 48" role="img">
+              <path d="M10 39V21a14 14 0 0 1 28 0v18M7 39h34M14 39V22a10 10 0 0 1 20 0v17" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
+              <path d="M24 12c-1 4-5 6-5 10a5 5 0 0 0 10 0c0-3-3-5-5-10Z" fill="#d7a20f" />
+              <path d="M18 32h12M18 36h12" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth="1.5" />
+            </svg>
           </span>
           <span className={styles.brandText}><strong>Digitalno groblje</strong><small>Uspomene koje traju</small></span>
         </a>
@@ -1549,13 +1738,18 @@ export default function Home() {
       )}
 
       {place !== "kapija" && (
-        <section className={`${styles.exploreView} ${place === "tabla" ? styles.boardExploreView : ""}`} aria-live="polite">
-          <div className={place === "groblje" ? styles.exploreTopline : undefined}>
-            <div className={`${styles.exploreHeading} ${place === "tabla" ? styles.boardPageHeading : ""}`}>
+        <section className={`${styles.exploreView} ${place === "tabla" || place === "about" || place === "terms" || place === "pricelist" || place === "contact" ? styles.boardExploreView : ""} ${place === "about" || place === "terms" || place === "pricelist" || place === "contact" ? styles.infoExploreView : ""}`} aria-live="polite">
+          <div className={place === "groblje" ? styles.exploreTopline : place === "about" || place === "terms" || place === "pricelist" || place === "contact" ? styles.infoHeadingRow : undefined}>
+            <div className={`${styles.exploreHeading} ${place === "tabla" || place === "about" || place === "terms" || place === "pricelist" || place === "contact" ? styles.boardPageHeading : ""}`}>
               <span className={styles.eyebrow}>Digitalno groblje</span>
-              <h1>{place === "tabla" ? "Informaciona tabla: Pomeni" : selectedPlace?.label}</h1>
-              <p>{place === "groblje" ? "Mesto za uspomene koje ostaju." : place === "tabla" ? "Pretražite uspomene i pronađite grob." : "Najnovije vesti i uspomene zajednice."}</p>
+              <h1>{place === "tabla" ? "Informaciona tabla: Pomeni" : place === "about" ? "O nama" : place === "terms" ? "Uslovi korišćenja" : place === "pricelist" ? "Cjenovnik" : place === "contact" ? "Kontakt" : selectedPlace?.label}</h1>
+              <p>{place === "groblje" ? "Mesto za uspomene koje ostaju." : place === "tabla" ? "Pretražite uspomene i pronađite grob." : place === "about" ? "Zašto postoji Digitalno groblje i kako ga koristimo." : place === "terms" ? "Pravila korišćenja Digitalnog groblja." : place === "pricelist" ? "Pregled probnih cijena i trajanja digitalnih poklona." : place === "contact" ? "Pitanja, predlozi ili prijava problema — pišite nam." : "Najnovije vesti i uspomene zajednice."}</p>
             </div>
+            {(place === "about" || place === "terms" || place === "pricelist" || place === "contact") && (
+              <button className={styles.backToGate} onClick={() => showPlace("kapija")}>
+                ← Početna strana
+              </button>
+            )}
             {place === "groblje" && (
               <div className={styles.graveyardToolbar}>
                 <label htmlFor="cemetery-faith">Verska pripadnost</label>
@@ -1792,8 +1986,88 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          ) : place === "about" ? (
+            <div className={styles.aboutContent}>
+              <ol>
+                {aboutSections.map((section) => (
+                  <li key={section.title}>
+                    <article>
+                      <h2>{section.title}</h2>
+                      <p>{section.text}</p>
+                    </article>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : place === "terms" ? (
+            <div className={styles.termsContent}>
+              <aside className={styles.termsDraftNotice}>
+                Ovaj dokument je početni nacrt za probnu verziju sajta. Podaci o registrovanom pružaocu usluge i konačni pravni tekst moraju biti uneseni i provjereni prije aktiviranja naručivanja ili naplate.
+              </aside>
+              <ol>
+                {termsSections.map((section) => (
+                  <li key={section.title}>
+                    <article>
+                      <h2>{section.title}</h2>
+                      <p>{section.text}</p>
+                    </article>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : place === "pricelist" ? (
+            <div className={styles.infoPageContent}>
+              <p className={styles.pricelistIntro}>
+                Cijene su prikazane u eurima. Ovo je probni cjenovnik; kupovina, naručivanje i plaćanje trenutno nijesu omogućeni.
+              </p>
+              <div className={styles.infoTableWrap}>
+                <table className={styles.infoTable}>
+                  <thead>
+                    <tr>
+                      <th scope="col">Opis usluge</th>
+                      <th scope="col">Trajanje prikaza</th>
+                      <th scope="col">Cijena</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {priceListRows.map((row) => (
+                      <tr key={row.period}>
+                        <td>{row.service}</td>
+                        <td>{row.period}</td>
+                        <td>{row.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <aside className={styles.termsDraftNotice}>
+                Trajanje i cijene prate probne opcije prikazane u prodavnici i mogu se promijeniti prije pokretanja usluge. Konačni uslovi, porezi i način plaćanja biće objavljeni prije nego što kupovina postane dostupna.
+              </aside>
+            </div>
+          ) : place === "contact" ? (
+            <div className={`${styles.infoPageContent} ${styles.contactContent}`}>
+              <section className={styles.contactCard}>
+                <h2>Pošaljite nam poruku</h2>
+                <p>Imate pitanje ili želite da prijavite problem? Pišite nam putem emaila. U poruci navedite vezu do stranice ili pomena na koji se upit odnosi.</p>
+                <a className={styles.contactEmailButton} href={`mailto:${contactAddress}?subject=${encodeURIComponent("Upit za Digitalno groblje")}`}>
+                  Pošalji email <span aria-hidden="true">→</span>
+                </a>
+              </section>
+              <section className={styles.contactCard}>
+                <h2>Kontakt podaci</h2>
+                <dl>
+                  <div><dt>Email</dt><dd><a href={`mailto:${contactAddress}`}>{contactAddress}</a></dd></div>
+                  <div><dt>Odgovor</dt><dd>Odgovorićemo čim budemo u mogućnosti.</dd></div>
+                </dl>
+                <p className={styles.contactNote}>Puni podaci registrovanog poslovnog subjekta biće objavljeni prije pokretanja komercijalnih usluga.</p>
+              </section>
+            </div>
           ) : null}
-          <button className={styles.backToGate} onClick={() => showPlace("kapija")}>← Nazad na kapiju</button>
+          {place !== "about" && place !== "terms" && place !== "pricelist" && place !== "contact" && (
+            <button className={styles.backToGate} onClick={() => showPlace("kapija")}>
+              ← Nazad na kapiju
+            </button>
+          )}
         </section>
       )}
 
@@ -2230,7 +2504,7 @@ export default function Home() {
                   </aside>
                   <label className={styles.storeTerms}>
                     <input type="checkbox" checked={storeTermsAccepted} onChange={(event) => setStoreTermsAccepted(event.target.checked)} />
-                    <span>Prihvatam <a href="mailto:djurovicandrija21@gmail.com?subject=Uslovi%20kori%C5%A1%C4%87enja">Uslove korišćenja</a> <b>*</b></span>
+                    <span>Prihvatam <a href="#uslovi-koriscenja" onClick={(event) => { event.preventDefault(); openInfoPage("terms"); }}>Uslove korišćenja</a> <b>*</b></span>
                   </label>
                 </div>
               )}
@@ -2273,11 +2547,10 @@ export default function Home() {
 
       <footer className={styles.footer}>
         <nav aria-label="Informacije">
-          <button onClick={() => showPlace("tabla")} aria-current={place === "tabla" ? "page" : undefined}>O nama</button><i />
-          <a href="mailto:djurovicandrija21@gmail.com?subject=Uslovi%20kori%C5%A1%C4%87enja">Uslovi korišćenja</a><i />
-          <a href="mailto:djurovicandrija21@gmail.com?subject=Privatnost">Privatnost</a><i />
-          <button onClick={openStore} aria-current={panel === "store" ? "page" : undefined}>Cjenovnik</button><i />
-          <a href="mailto:djurovicandrija21@gmail.com">Kontakt</a>
+          <button onClick={() => showPlace("about")} aria-current={place === "about" ? "page" : undefined}>O nama</button><i />
+          <button onClick={() => openInfoPage("terms")} aria-current={place === "terms" ? "page" : undefined}>Uslovi korišćenja</button><i />
+          <button onClick={() => openInfoPage("pricelist")} aria-current={place === "pricelist" ? "page" : undefined}>Cjenovnik</button><i />
+          <button onClick={() => openInfoPage("contact")} aria-current={place === "contact" ? "page" : undefined}>Kontakt</button>
         </nav>
         <p>© 2026 Digitalno groblje <span>·</span> Uspomene koje traju</p>
         <div className={styles.photoCredits}>
