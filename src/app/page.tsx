@@ -968,7 +968,7 @@ export default function Home() {
   }
 
   async function startAmbientMusic(autoplayAttempt: boolean): Promise<boolean> {
-    if (ambientStartPromiseRef.current) return ambientStartPromiseRef.current;
+    if (ambientStartPromiseRef.current && autoplayAttempt) return ambientStartPromiseRef.current;
     const startPromise = (async () => {
       const AudioContextConstructor = window.AudioContext;
       if (!AudioContextConstructor) {
@@ -1041,7 +1041,9 @@ export default function Home() {
       return await startPromise;
     } catch (error) {
       const blockedByAutoplay = autoplayAttempt && error instanceof Error && error.name === "NotAllowedError";
-      if (!blockedByAutoplay) {
+      if (blockedByAutoplay) {
+        setNotice("Chrome i Edge blokiraju automatsko puštanje zvuka. Kliknite ikonu zvuka da uključite muziku.");
+      } else {
         setNotice(`Ambijentalna muzika nije mogla da se pokrene. ${error instanceof Error ? error.message : String(error)}`);
       }
       return false;
@@ -1100,13 +1102,18 @@ export default function Home() {
       for (let index = 0; index < noise.length; index += 1) {
         const pseudoRandom = Math.sin((index + now * context.sampleRate + 1) * 12.9898) * 43758.5453;
         const whiteNoise = (pseudoRandom - Math.floor(pseudoRandom)) * 2 - 1;
-        previousSample = (whiteNoise + previousSample * 0.94) * 0.12;
+        previousSample = (whiteNoise + previousSample * 0.94) * 0.34;
         noise[index] = previousSample;
       }
 
       const source = context.createBufferSource();
       const filter = context.createBiquadFilter();
       const creakGain = context.createGain();
+      const hinge = context.createOscillator();
+      const hingeFilter = context.createBiquadFilter();
+      const hingeGain = context.createGain();
+      const secondHinge = context.createOscillator();
+      const secondHingeGain = context.createGain();
       source.buffer = noiseBuffer;
       filter.type = "bandpass";
       filter.frequency.setValueAtTime(360, now);
@@ -1114,18 +1121,46 @@ export default function Home() {
       filter.frequency.linearRampToValueAtTime(290, now + duration);
       filter.Q.value = 1.25;
       creakGain.gain.setValueAtTime(0.0001, now);
-      creakGain.gain.linearRampToValueAtTime(0.085, now + 0.35);
-      creakGain.gain.setValueAtTime(0.045, now + 1.25);
+      creakGain.gain.linearRampToValueAtTime(0.3, now + 0.35);
+      creakGain.gain.setValueAtTime(0.2, now + 1.25);
       creakGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      hinge.type = "sawtooth";
+      hinge.frequency.setValueAtTime(96, now);
+      hinge.frequency.linearRampToValueAtTime(68, now + 1.35);
+      hinge.frequency.linearRampToValueAtTime(84, now + duration);
+      hingeFilter.type = "lowpass";
+      hingeFilter.frequency.setValueAtTime(420, now);
+      hingeFilter.frequency.linearRampToValueAtTime(300, now + duration);
+      hingeGain.gain.setValueAtTime(0.0001, now);
+      hingeGain.gain.linearRampToValueAtTime(0.075, now + 0.3);
+      hingeGain.gain.setValueAtTime(0.06, now + 1.4);
+      hingeGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      secondHinge.type = "triangle";
+      secondHinge.frequency.setValueAtTime(172, now);
+      secondHinge.frequency.linearRampToValueAtTime(116, now + 1.4);
+      secondHinge.frequency.linearRampToValueAtTime(148, now + duration);
+      secondHingeGain.gain.setValueAtTime(0.0001, now);
+      secondHingeGain.gain.linearRampToValueAtTime(0.035, now + 0.35);
+      secondHingeGain.gain.setValueAtTime(0.02, now + 1.4);
+      secondHingeGain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
       source.connect(filter);
       filter.connect(creakGain);
       creakGain.connect(context.destination);
+      hinge.connect(hingeFilter);
+      hingeFilter.connect(hingeGain);
+      hingeGain.connect(context.destination);
+      secondHinge.connect(secondHingeGain);
+      secondHingeGain.connect(context.destination);
       source.onended = () => {
         if (gateSoundContextRef.current === context) gateSoundContextRef.current = null;
         void context.close();
       };
       source.start(now);
       source.stop(now + duration);
+      hinge.start(now);
+      hinge.stop(now + duration);
+      secondHinge.start(now);
+      secondHinge.stop(now + duration);
     } catch (error) {
       const context = gateSoundContextRef.current;
       gateSoundContextRef.current = null;
@@ -1490,7 +1525,8 @@ export default function Home() {
       window.removeEventListener("pointerdown", startOnGesture, true);
       window.removeEventListener("keydown", startOnGesture, true);
     };
-    const startOnGesture = () => {
+    const startOnGesture = (event: Event) => {
+      if (event.target instanceof Element && event.target.closest("[data-sound-toggle]")) return;
       void startAmbientMusic(false).then((started) => {
         if (started) removeGestureListeners();
       });
@@ -1689,6 +1725,7 @@ export default function Home() {
           <div className={styles.iconNav}>
             <button aria-label="Pretraži spomenike" onClick={() => { setQuery(""); setPanel("search"); }}>⌕</button>
             <button
+              data-sound-toggle
               aria-label={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
               aria-pressed={!isMuted}
               title={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
@@ -1714,6 +1751,7 @@ export default function Home() {
             </span>
           ))}
           <button
+            data-sound-toggle
             className={styles.mobileSoundToggle}
             aria-label={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
             aria-pressed={!isMuted}
