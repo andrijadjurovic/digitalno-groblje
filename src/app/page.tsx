@@ -106,6 +106,14 @@ type SavedOffering = {
   createdAt: number;
 };
 
+type MemorialOfferingItem = {
+  id: string;
+  product: StoreProduct;
+  dedication: string;
+  signature: string;
+  createdAt: number;
+};
+
 type GalleryPhoto = {
   id: string;
   image: string;
@@ -119,6 +127,7 @@ const startingMemorials: Memorial[] = [
   { id: 4, name: "Ana Marković", years: "1962 — 2020", epitaph: "Zauvijek dio naših srca.", candles: 4, flowers: 4, faith: "christian", burialPlace: "cemetery", tombstoneStyle: "christian-model-1", birthDate: "1962-10-09", deathDate: "2020-05-22" },
   { id: 5, name: "Nikola Jovanović", years: "1951 — 2019", epitaph: "Tvoja dobrota ostaje s nama.", candles: 3, flowers: 3, faith: "christian", burialPlace: "cemetery", tombstoneStyle: "christian-model-2", birthDate: "1951-08-13", deathDate: "2019-12-01" },
   { id: 6, name: "Marija Popović", years: "1944 — 2022", epitaph: "S ljubavlju čuvamo uspomenu.", candles: 4, flowers: 3, faith: "christian", burialPlace: "cemetery", tombstoneStyle: "christian-model-3", birthDate: "1944-04-27", deathDate: "2022-03-16" },
+  { id: 7, name: "Luka Radović", years: "1955 — 2024", epitaph: "Zauvijek ćemo te nositi u srcu.", candles: 0, flowers: 0, faith: "christian", burialPlace: "cemetery", tombstoneStyle: "christian-model-1", birthDate: "1955-05-16", deathDate: "2024-02-03" },
 ];
 
 const places: { id: Place; label: string }[] = [
@@ -458,6 +467,40 @@ function getMemorialOfferingItems(memorialId: number, totals: OfferingCounts) {
   });
 }
 
+function getMemorialDisplayOfferings(
+  memorial: Memorial,
+  counts: OfferingCounts,
+  savedItems: SavedOffering[],
+): MemorialOfferingItem[] {
+  const legacyCounts = {
+    candles: Math.max(counts.candles - savedItems.filter((item) => storeProducts.find((product) => product.id === item.productId)?.category === "candles").length, 0),
+    flowers: Math.max(counts.flowers - savedItems.filter((item) => storeProducts.find((product) => product.id === item.productId)?.category === "flowers").length, 0),
+  };
+  const sampleItems = getMemorialOfferingItems(memorial.id, {
+    candles: memorial.candles,
+    flowers: memorial.flowers,
+  }).map(({ product, index }) => ({
+    id: `sample-${memorial.id}-${product.category}-${index}`,
+    product,
+    dedication: `Uspomena na ${memorial.name}.`,
+    signature: "Porodica",
+    createdAt: 0,
+  }));
+  const legacyItems = getMemorialOfferingItems(memorial.id + 13, legacyCounts).map(({ product, index }) => ({
+    id: `legacy-${memorial.id}-${product.category}-${index}`,
+    product,
+    dedication: "",
+    signature: "Anonimno",
+    createdAt: 0,
+  }));
+  const individualItems = savedItems.flatMap((item) => {
+    const product = storeProducts.find((candidate) => candidate.id === item.productId);
+    return product ? [{ ...item, product }] : [];
+  });
+  individualItems.sort((left, right) => right.createdAt - left.createdAt);
+  return [...individualItems, ...legacyItems, ...sampleItems];
+}
+
 function isSavedOffering(value: unknown): value is {
   productId: string;
   dedication: string;
@@ -573,7 +616,7 @@ function describeFirebaseError(error: unknown) {
     return "Uključi Anonymous prijavljivanje u Firebase Console → Authentication → Sign-in method.";
   }
   if (code === "permission-denied") {
-    return "Firestore je odbio pristup. Objavi pravila iz firestore.rules u Firebase Console → Firestore Database → Rules.";
+    return "Firestore je odbio pristup. Proveri da li je Anonymous prijavljivanje uključeno i da li su firestore.rules objavljena u istom Firebase projektu kao aplikacija.";
   }
   return error instanceof Error ? error.message : String(error);
 }
@@ -594,6 +637,58 @@ function WeatherIcon({ weather }: { weather: Weather }) {
   return <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 37h30a10 10 0 0 0 1-20 16 16 0 0 0-30-3A12 12 0 0 0 16 37Z" /><path d="m34 38-9 13h8l-3 10 13-17h-9l4-6" /></svg>;
 }
 
+function SoundIcon({ muted }: { muted: boolean }) {
+  return muted ? (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
+    </svg>
+  );
+}
+
+function playPianoNote(context: AudioContext, output: GainNode, frequency: number) {
+  const now = context.currentTime;
+  const partials = [
+    { ratio: 1, volume: 0.19 },
+    { ratio: 2, volume: 0.035 },
+    { ratio: 3, volume: 0.012 },
+  ];
+
+  partials.forEach(({ ratio, volume }) => {
+    const oscillator = context.createOscillator();
+    const envelope = context.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency * ratio;
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.linearRampToValueAtTime(volume, now + 0.012);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
+    oscillator.connect(envelope);
+    envelope.connect(output);
+    oscillator.start(now);
+    oscillator.stop(now + 2.5);
+  });
+}
+
+function playBirdChirp(context: AudioContext, output: GainNode) {
+  const now = context.currentTime;
+  const oscillator = context.createOscillator();
+  const envelope = context.createGain();
+  oscillator.type = "sine";
+  oscillator.frequency.setValueAtTime(1850, now);
+  oscillator.frequency.linearRampToValueAtTime(2550, now + 0.11);
+  oscillator.frequency.linearRampToValueAtTime(2100, now + 0.23);
+  envelope.gain.setValueAtTime(0.0001, now);
+  envelope.gain.linearRampToValueAtTime(0.016, now + 0.025);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
+  oscillator.connect(envelope);
+  envelope.connect(output);
+  oscillator.start(now);
+  oscillator.stop(now + 0.3);
+}
+
 export default function Home() {
   const worldRef = useRef<HTMLElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
@@ -604,6 +699,11 @@ export default function Home() {
   const entryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gravePageTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const gravePageAnimationFrameRef = useRef<number | null>(null);
+  const firestorePermissionErrorShownRef = useRef(false);
+  const ambientAudioContextRef = useRef<AudioContext | null>(null);
+  const ambientGainRef = useRef<GainNode | null>(null);
+  const ambientMusicTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const ambientSuspendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [place, setPlace] = useState<Place>("kapija");
   const [enteringPlace, setEnteringPlace] = useState<"groblje" | null>(null);
   const [sceneArrived, setSceneArrived] = useState(false);
@@ -618,6 +718,8 @@ export default function Home() {
   const [storeStep, setStoreStep] = useState(0);
   const [storeProductId, setStoreProductId] = useState<string | null>(null);
   const [storeMemorialId, setStoreMemorialId] = useState<number | null>(null);
+  const [storeMemorialIsFixed, setStoreMemorialIsFixed] = useState(false);
+  const [showOfferingPreview, setShowOfferingPreview] = useState(false);
   const [storeDedication, setStoreDedication] = useState("");
   const [storeSignature, setStoreSignature] = useState("");
   const [storeDuration, setStoreDuration] = useState("30");
@@ -635,6 +737,9 @@ export default function Home() {
   const [memorialImage, setMemorialImage] = useState("");
   const [cemeteryFaith, setCemeteryFaith] = useState<MemorialFaithFilter>("all");
   const [gravePage, setGravePage] = useState(0);
+  const [boardQuery, setBoardQuery] = useState("");
+  const [boardRowsPerPage, setBoardRowsPerPage] = useState(25);
+  const [boardPage, setBoardPage] = useState(0);
   const [gravePageTransition, setGravePageTransition] = useState<{
     from: number;
     to: number;
@@ -659,9 +764,22 @@ export default function Home() {
       ),
     [memorials, query],
   );
+  const boardMemorials = useMemo(() => {
+    const normalizedQuery = boardQuery.trim().toLocaleLowerCase("sr-Latn");
+    return memorials
+      .filter((memorial) =>
+        `${memorial.name} #${memorial.id}`.toLocaleLowerCase("sr-Latn").includes(normalizedQuery),
+      )
+      .sort((left, right) => right.id - left.id);
+  }, [memorials, boardQuery]);
+  const recentBoardMemorials = useMemo(
+    () => [...memorials].sort((left, right) => (right.deathDate ?? "").localeCompare(left.deathDate ?? "")).slice(0, 3),
+    [memorials],
+  );
   const selectedTombstoneModel = tombstoneModels.find((model) => model.id === tombstoneStyle);
   const selectedTombstoneTradition = tombstoneTraditions.find((tradition) => tradition.id === selectedTombstoneModel?.tradition);
   const storeMemorial = memorials.find((memorial) => memorial.id === storeMemorialId);
+  const storeSelectedProduct = storeProducts.find((product) => product.id === storeProductId);
   const selectedOfferingTotals = selected
     ? {
         candles: selected.candles + (offeringCounts[selected.id]?.candles ?? 0),
@@ -669,36 +787,11 @@ export default function Home() {
       }
     : null;
   const selectedOfferingItems = selected && selectedOfferingTotals
-    ? (() => {
-        const savedItems = savedOfferings[selected.id] ?? [];
-        const legacyCounts = {
-          candles: Math.max((offeringCounts[selected.id]?.candles ?? 0) - savedItems.filter((item) => storeProducts.find((product) => product.id === item.productId)?.category === "candles").length, 0),
-          flowers: Math.max((offeringCounts[selected.id]?.flowers ?? 0) - savedItems.filter((item) => storeProducts.find((product) => product.id === item.productId)?.category === "flowers").length, 0),
-        };
-        const sampleItems = getMemorialOfferingItems(selected.id, {
-          candles: selected.candles,
-          flowers: selected.flowers,
-        }).map(({ product, index }) => ({
-          id: `sample-${selected.id}-${product.category}-${index}`,
-          product,
-          dedication: `Uspomena na ${selected.name}.`,
-          signature: "Porodica",
-          createdAt: 0,
-        }));
-        const legacyItems = getMemorialOfferingItems(selected.id + 13, legacyCounts).map(({ product, index }) => ({
-          id: `legacy-${selected.id}-${product.category}-${index}`,
-          product,
-          dedication: "",
-          signature: "Anonimno",
-          createdAt: 0,
-        }));
-        const individualItems = savedItems.flatMap((item) => {
-          const product = storeProducts.find((candidate) => candidate.id === item.productId);
-          return product ? [{ ...item, product }] : [];
-        });
-        individualItems.sort((left, right) => right.createdAt - left.createdAt);
-        return [...individualItems, ...legacyItems, ...sampleItems];
-      })()
+    ? getMemorialDisplayOfferings(
+        selected,
+        offeringCounts[selected.id] ?? { candles: 0, flowers: 0 },
+        savedOfferings[selected.id] ?? [],
+      )
     : [];
   const selectedGalleryPhotos = selected
     ? [...(galleryPhotos[selected.id] ?? [])].sort((left, right) => right.createdAt - left.createdAt)
@@ -786,6 +879,114 @@ export default function Home() {
     setNotice("");
   }
 
+  function reportFirestoreListenerError(context: string, error: unknown) {
+    const code = typeof error === "object" && error !== null && "code" in error && typeof error.code === "string"
+      ? error.code
+      : "";
+    if (code === "permission-denied") {
+      if (firestorePermissionErrorShownRef.current) return;
+      firestorePermissionErrorShownRef.current = true;
+      setNotice(`Firestore je odbio pristup. Proveri da li je Anonymous prijavljivanje uključeno i da li su firestore.rules objavljena u istom Firebase projektu kao aplikacija.`);
+      return;
+    }
+    setNotice(`${context} ${describeFirebaseError(error)}`);
+  }
+
+  async function toggleAmbientMusic() {
+    if (!isMuted) {
+      const context = ambientAudioContextRef.current;
+      try {
+        if (context?.state === "running") {
+          ambientGainRef.current?.gain.setTargetAtTime(0.0001, context.currentTime, 0.12);
+          if (ambientSuspendTimerRef.current) clearTimeout(ambientSuspendTimerRef.current);
+          ambientSuspendTimerRef.current = setTimeout(() => {
+            ambientSuspendTimerRef.current = null;
+            if (context.state === "running") void context.suspend();
+          }, 600);
+        }
+        setIsMuted(true);
+      } catch (error) {
+        setNotice(`Ambijentalna muzika nije mogla da se zaustavi. ${error instanceof Error ? error.message : String(error)}`);
+      }
+      return;
+    }
+
+    try {
+      const AudioContextConstructor = window.AudioContext;
+      if (!AudioContextConstructor) {
+        setNotice("Ovaj pregledač ne podržava ambijentalnu muziku.");
+        return;
+      }
+
+      let context = ambientAudioContextRef.current;
+      if (!context || context.state === "closed") {
+        const newContext = new AudioContextConstructor();
+        context = newContext;
+        const masterGain = newContext.createGain();
+        masterGain.gain.setValueAtTime(0, newContext.currentTime);
+        masterGain.connect(newContext.destination);
+        ambientGainRef.current = masterGain;
+
+        const natureBuffer = newContext.createBuffer(1, newContext.sampleRate * 3, newContext.sampleRate);
+        const natureSamples = natureBuffer.getChannelData(0);
+        for (let index = 0; index < natureSamples.length; index += 1) {
+          natureSamples[index] = (Math.random() * 2 - 1) * 0.5;
+        }
+        const natureSource = newContext.createBufferSource();
+        const natureFilter = newContext.createBiquadFilter();
+        const natureGain = newContext.createGain();
+        natureSource.buffer = natureBuffer;
+        natureSource.loop = true;
+        natureFilter.type = "lowpass";
+        natureFilter.frequency.value = 520;
+        natureFilter.Q.value = 0.4;
+        natureGain.gain.value = 0.012;
+        natureSource.connect(natureFilter);
+        natureFilter.connect(natureGain);
+        natureGain.connect(masterGain);
+        natureSource.start();
+
+        const chords = [
+          [261.63, 329.63, 392],
+          [220, 261.63, 329.63],
+          [174.61, 220, 261.63],
+          [196, 246.94, 293.66],
+        ];
+        let step = 0;
+        ambientMusicTimerRef.current = setInterval(() => {
+          if (newContext.state !== "running") return;
+          const chord = chords[Math.floor(step / 3) % chords.length];
+          playPianoNote(newContext, masterGain, chord[step % 3]);
+          if (step % 9 === 5) playBirdChirp(newContext, masterGain);
+          step += 1;
+        }, 1700);
+        ambientAudioContextRef.current = newContext;
+      }
+
+      const activeContext = context;
+      await activeContext.resume();
+      if (ambientSuspendTimerRef.current) {
+        clearTimeout(ambientSuspendTimerRef.current);
+        ambientSuspendTimerRef.current = null;
+      }
+      ambientGainRef.current?.gain.setTargetAtTime(0.55, activeContext.currentTime, 1.2);
+      setIsMuted(false);
+      setNotice("");
+    } catch (error) {
+      setNotice(`Ambijentalna muzika nije mogla da se pokrene. ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  function openMemorialFromBoard(memorial: Memorial) {
+    setSelected(memorial);
+    setPanel(null);
+    setCemeteryFaith("all");
+    setPlace("groblje");
+    const memorialIndex = memorials.findIndex((item) => item.id === memorial.id);
+    setGravePage(Math.floor(memorialIndex / GRAVES_PER_PAGE));
+    cancelGravePageTransition();
+  }
+
   function enterThroughGate() {
     if (enteringPlace || entryTimerRef.current) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -837,6 +1038,8 @@ export default function Home() {
     setStoreStep(0);
     setStoreProductId(null);
     setStoreMemorialId(null);
+    setStoreMemorialIsFixed(false);
+    setShowOfferingPreview(false);
     setStoreDedication("");
     setStoreSignature("");
     setStoreDuration("30");
@@ -879,16 +1082,35 @@ export default function Home() {
     }
   }
 
-  function openStoreFor(memorial: Memorial, product?: StoreProduct) {
-    setStoreCategory(product?.category ?? "candles");
+  function openStoreFor(memorial: Memorial, product?: StoreProduct, category: StoreCategory = "candles") {
+    setStoreCategory(product?.category ?? category);
     setCandleTradition(product?.tradition ?? "all");
     setStoreStep(product ? 1 : 0);
     setStoreProductId(product?.id ?? null);
     setStoreMemorialId(memorial.id);
+    setStoreMemorialIsFixed(true);
+    setShowOfferingPreview(false);
     setStoreDedication("");
     setStoreSignature("");
     setStoreDuration("30");
     setStoreTermsAccepted(false);
+    setNotice("");
+    setSelected(null);
+    setPanel("store");
+  }
+
+  function openOfferingPreview(memorial: Memorial, offering: MemorialOfferingItem) {
+    setStoreCategory(offering.product.category);
+    setCandleTradition(offering.product.tradition ?? "all");
+    setStoreStep(1);
+    setStoreProductId(offering.product.id);
+    setStoreMemorialId(memorial.id);
+    setStoreMemorialIsFixed(true);
+    setStoreDedication(offering.dedication);
+    setStoreSignature(offering.signature);
+    setStoreDuration("30");
+    setStoreTermsAccepted(false);
+    setShowOfferingPreview(true);
     setNotice("");
     setSelected(null);
     setPanel("store");
@@ -1046,7 +1268,7 @@ export default function Home() {
             },
             (error) => {
               if (active) {
-                setNotice(`Ne mogu učitati brojače za uspomenu „${memorial.name}”. ${describeFirebaseError(error)}`);
+                reportFirestoreListenerError(`Ne mogu učitati brojače za uspomenu „${memorial.name}”.`, error);
               }
             },
           );
@@ -1076,7 +1298,7 @@ export default function Home() {
             },
             (error) => {
               if (active) {
-                setNotice(`Ne mogu učitati poklone za uspomenu „${memorial.name}”. ${describeFirebaseError(error)}`);
+                reportFirestoreListenerError(`Ne mogu učitati poklone za uspomenu „${memorial.name}”.`, error);
               }
             },
           );
@@ -1094,6 +1316,13 @@ export default function Home() {
       active = false;
       unsubscribeListeners.forEach((unsubscribe) => unsubscribe());
     };
+  }, []);
+
+  useEffect(() => () => {
+    if (ambientMusicTimerRef.current) clearInterval(ambientMusicTimerRef.current);
+    if (ambientSuspendTimerRef.current) clearTimeout(ambientSuspendTimerRef.current);
+    const context = ambientAudioContextRef.current;
+    if (context && context.state !== "closed") void context.close();
   }, []);
 
   useEffect(() => {
@@ -1128,7 +1357,7 @@ export default function Home() {
           },
           (error) => {
             if (active) {
-              setNotice(`Ne mogu učitati galeriju za uspomenu „${memorialName}”. ${describeFirebaseError(error)}`);
+              reportFirestoreListenerError(`Ne mogu učitati galeriju za uspomenu „${memorialName}”.`, error);
             }
           },
         );
@@ -1274,17 +1503,9 @@ export default function Home() {
               aria-label={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
               aria-pressed={!isMuted}
               title={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
-              onClick={() => setIsMuted((muted) => !muted)}
+              onClick={() => void toggleAmbientMusic()}
             >
-              {isMuted ? (
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
-                </svg>
-              )}
+              <SoundIcon muted={isMuted} />
             </button>
             <span className={styles.language}>CG</span>
           </div>
@@ -1303,6 +1524,15 @@ export default function Home() {
               </button>
             </span>
           ))}
+          <button
+            className={styles.mobileSoundToggle}
+            aria-label={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
+            aria-pressed={!isMuted}
+            title={isMuted ? "Uključi zvuk" : "Isključi zvuk"}
+            onClick={() => void toggleAmbientMusic()}
+          >
+            <SoundIcon muted={isMuted} />
+          </button>
         </nav>
       </header>
 
@@ -1319,12 +1549,12 @@ export default function Home() {
       )}
 
       {place !== "kapija" && (
-        <section className={styles.exploreView} aria-live="polite">
+        <section className={`${styles.exploreView} ${place === "tabla" ? styles.boardExploreView : ""}`} aria-live="polite">
           <div className={place === "groblje" ? styles.exploreTopline : undefined}>
-            <div className={styles.exploreHeading}>
+            <div className={`${styles.exploreHeading} ${place === "tabla" ? styles.boardPageHeading : ""}`}>
               <span className={styles.eyebrow}>Digitalno groblje</span>
-              <h1>{selectedPlace?.label}</h1>
-              <p>{place === "groblje" ? "Mesto za uspomene koje ostaju." : "Najnovije vesti i uspomene zajednice."}</p>
+              <h1>{place === "tabla" ? "Informaciona tabla: Pomeni" : selectedPlace?.label}</h1>
+              <p>{place === "groblje" ? "Mesto za uspomene koje ostaju." : place === "tabla" ? "Pretražite uspomene i pronađite grob." : "Najnovije vesti i uspomene zajednice."}</p>
             </div>
             {place === "groblje" && (
               <div className={styles.graveyardToolbar}>
@@ -1381,11 +1611,11 @@ export default function Home() {
                       inert={pagePosition !== 0}
                     >
                   {memorialsOnPage.map((memorial, index) => {
-                const totals = {
-                  candles: memorial.candles + (offeringCounts[memorial.id]?.candles ?? 0),
-                  flowers: memorial.flowers + (offeringCounts[memorial.id]?.flowers ?? 0),
-                };
-                const offeringItems = getMemorialOfferingItems(memorial.id, totals);
+                const offeringItems = getMemorialDisplayOfferings(
+                  memorial,
+                  offeringCounts[memorial.id] ?? { candles: 0, flowers: 0 },
+                  savedOfferings[memorial.id] ?? [],
+                );
                 return (
                 <div className={`${styles.graveMarker} ${styles[`grave${index + 1}`]}`} key={memorial.id}>
                   <button
@@ -1404,13 +1634,13 @@ export default function Home() {
                     </TombstoneArtwork>
                   </button>
                   <span className={styles.markerOfferings}>
-                    {offeringItems.map(({ product, index }, position) => (
+                    {offeringItems.map((offering, position) => (
                       <button
                         type="button"
-                        className={styles.markerOfferingButton}
-                        key={`${product.id}-${index}`}
-                        aria-label={`${product.category === "candles" ? "Upaljena svijeća" : "Ostavljen buket"} za ${memorial.name}`}
-                        onClick={() => openStoreFor(memorial, product)}
+                        className={`${styles.markerOfferingButton} ${offering.product.category === "candles" ? styles.markerOfferingCandle : ""}`}
+                        key={offering.id}
+                        aria-label={`${offering.product.category === "candles" ? "Upaljena svijeća" : "Ostavljen buket"} za ${memorial.name}${offering.signature ? `, potpis: ${offering.signature}` : ""}`}
+                        onClick={() => openOfferingPreview(memorial, offering)}
                         style={{
                           left: `${14 + ((Math.sin((memorial.id * 97 + position * 31) * 12.9898) + 1) / 2) * 72}%`,
                           bottom: `${2 + ((Math.cos((memorial.id * 71 + position * 23) * 7.233) + 1) / 2) * 18}%`,
@@ -1420,7 +1650,7 @@ export default function Home() {
                       >
                         <Image
                           className={styles.markerOfferingImage}
-                          src={product.image}
+                          src={offering.product.image}
                           alt=""
                           width={64}
                           height={64}
@@ -1462,9 +1692,105 @@ export default function Home() {
             </div>
           ) : place === "tabla" ? (
             <div className={styles.noticeBoard}>
-              <article><span>OBAVEŠTENJE</span><h2>Dobro došli na mesto sećanja</h2><p>Ostavite sveću ili podelite uspomenu. Ovaj prostor je u izradi.</p></article>
-              <article><span>POSLEDNJI POMEN</span><h2>{memorials[0]?.name}</h2><p>{memorials[0]?.epitaph}</p></article>
-              <button onClick={startNewMemorial}>Dodajte pomen <b>→</b></button>
+              <aside className={styles.boardMemorialCards} aria-label="Nedavni pomeni">
+                {recentBoardMemorials.map((memorial) => (
+                  <article className={styles.boardMemorialCard} key={memorial.id}>
+                    <p>S tugom se sjećamo</p>
+                    <span>{memorial.deathDate?.split("-").reverse().join(".")}</span>
+                    <h2>{memorial.name}</h2>
+                    <small>Rođen/a {memorial.birthDate?.split("-").reverse().join(".")}</small>
+                  </article>
+                ))}
+              </aside>
+              <div className={styles.boardDirectory}>
+                <div className={styles.boardControls}>
+                  <label className={styles.boardPageSize}>
+                    Prikaži
+                    <select
+                      value={boardRowsPerPage}
+                      onChange={(event) => {
+                        setBoardRowsPerPage(Number(event.target.value));
+                        setBoardPage(0);
+                      }}
+                      aria-label="Broj pomena po stranici"
+                    >
+                      {[5, 10, 25].map((count) => <option value={count} key={count}>{count}</option>)}
+                    </select>
+                  </label>
+                  <label className={styles.boardSearch}>
+                    <span className={styles.srOnly}>Pretražite po imenu ili broju groba</span>
+                    <input
+                      type="search"
+                      value={boardQuery}
+                      onChange={(event) => {
+                        setBoardQuery(event.target.value);
+                        setBoardPage(0);
+                      }}
+                      placeholder="Ime, prezime ili broj groba..."
+                    />
+                    <span aria-hidden="true">⌕</span>
+                  </label>
+                  <button className={styles.boardAddButton} onClick={startNewMemorial}>Novi pomen <b>＋</b></button>
+                </div>
+                <div className={styles.boardTableWrap}>
+                  <table className={styles.boardTable}>
+                    <thead>
+                      <tr>
+                        <th scope="col">Ime</th>
+                        <th scope="col">Prezime</th>
+                        <th scope="col">Datum rođenja</th>
+                        <th scope="col">Datum smrti</th>
+                        <th scope="col">Broj groba</th>
+                        <th scope="col">Prikaži</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {boardMemorials.slice(boardPage * boardRowsPerPage, (boardPage + 1) * boardRowsPerPage).map((memorial) => {
+                        const [firstName, ...surnameParts] = memorial.name.split(" ");
+                        return (
+                          <tr key={memorial.id}>
+                            <td>{firstName}</td>
+                            <td>{surnameParts.join(" ")}</td>
+                            <td>{memorial.birthDate ?? "—"}</td>
+                            <td>{memorial.deathDate ?? "—"}</td>
+                            <td className={styles.boardGraveNumber}>#{memorial.id}</td>
+                            <td>
+                              <button
+                                className={styles.boardShowButton}
+                                type="button"
+                                aria-label={`Prikaži grob: ${memorial.name}`}
+                                onClick={() => openMemorialFromBoard(memorial)}
+                              >
+                                <svg viewBox="0 0 24 28" aria-hidden="true"><path d="M12 2v4m-3-2h6M5 25V12a7 7 0 0 1 14 0v13M5 25h14M8 14h8m-8 4h8m-5-7v1" /></svg>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {boardMemorials.length === 0 && (
+                        <tr><td className={styles.boardEmpty} colSpan={6}>Nema pomena za uneti pojam.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className={styles.boardPagination}>
+                  <span aria-live="polite">
+                    {boardMemorials.length === 0
+                      ? "0 pomena"
+                      : `${boardPage * boardRowsPerPage + 1}–${Math.min((boardPage + 1) * boardRowsPerPage, boardMemorials.length)} od ${boardMemorials.length}`}
+                  </span>
+                  <div>
+                    <button type="button" onClick={() => setBoardPage((page) => Math.max(0, page - 1))} disabled={boardPage === 0}>Prethodna</button>
+                    <button
+                      type="button"
+                      onClick={() => setBoardPage((page) => page + 1)}
+                      disabled={(boardPage + 1) * boardRowsPerPage >= boardMemorials.length}
+                    >
+                      Sledeća
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : null}
           <button className={styles.backToGate} onClick={() => showPlace("kapija")}>← Nazad na kapiju</button>
@@ -1710,7 +2036,7 @@ export default function Home() {
 
             <div className={styles.storeStepContent}>
               <div className={styles.storeStepHeading}>
-                <h2>{storeStep === 0 ? "Izaberite svijeću, cvijeće ili kamen" : storeStep === 1 ? "Napišite uspomenu ili posvetu" : "Izaberite trajanje poklona"}</h2>
+                <h2>{storeStep === 0 ? "Izaberite svijeću, cvijeće ili kamen" : storeStep === 1 ? (showOfferingPreview ? "Uspomena i potpis uz poklon" : "Napišite uspomenu ili posvetu") : "Izaberite trajanje poklona"}</h2>
                 <p>Korak {storeStep + 1} od {storeSteps.length}</p>
               </div>
 
@@ -1796,19 +2122,21 @@ export default function Home() {
 
               {storeStep === 1 && (
                 <div className={styles.storeMemoryEditor}>
-                  <aside className={styles.storeMemorySide} aria-label="Izaberite uspomenu">
+                  <aside className={styles.storeMemorySide} aria-label={storeMemorialIsFixed ? "Odabrana uspomena" : "Izaberite uspomenu"}>
                     {storeMemorial && (
                       <>
                         <div className={styles.storePersonCard}>
                           <b>{storeMemorial.name}</b>
                           <small>Rođen/a: {formatTombstoneDate(storeMemorial.birthDate) ?? storeMemorial.years.split("—")[0].trim()}</small>
                           <small>Preminuo/la: {formatTombstoneDate(storeMemorial.deathDate) ?? storeMemorial.years.split("—")[1]?.trim()}</small>
-                          <label>
-                            Izaberite uspomenu
-                            <select value={storeMemorial.id} onChange={(event) => setStoreMemorialId(Number(event.target.value))}>
-                              {memorials.map((memorial) => <option value={memorial.id} key={memorial.id}>{memorial.name}</option>)}
-                            </select>
-                          </label>
+                          {!storeMemorialIsFixed && (
+                            <label>
+                              Izaberite uspomenu
+                              <select value={storeMemorial.id} onChange={(event) => setStoreMemorialId(Number(event.target.value))}>
+                                {memorials.map((memorial) => <option value={memorial.id} key={memorial.id}>{memorial.name}</option>)}
+                              </select>
+                            </label>
+                          )}
                         </div>
                         <figure className={styles.storeMemorialFigure}>
                           <TombstoneArtwork style={storeMemorial.tombstoneStyle} className={styles.storeMemorialArtwork} cutout>
@@ -1819,6 +2147,16 @@ export default function Home() {
                               years={storeMemorial.years}
                             />
                           </TombstoneArtwork>
+                          {storeSelectedProduct && (
+                            <Image
+                              className={styles.storeOfferingPreview}
+                              src={storeSelectedProduct.image}
+                              alt={storeSelectedProduct.name}
+                              width={160}
+                              height={160}
+                              unoptimized
+                            />
+                          )}
                         </figure>
                       </>
                     )}
@@ -1840,15 +2178,31 @@ export default function Home() {
                     )}
                   </aside>
                   <div className={styles.storeMemoryForm}>
-                    <label className={styles.storeDedication}>
-                      Uspomena ili posveta <span>Neobavezno</span>
-                      <textarea value={storeDedication} onChange={(event) => setStoreDedication(event.target.value)} placeholder="Uspomena na preminulog..." maxLength={180} />
-                      <small>{storeDedication.length}/180</small>
-                    </label>
-                    <label className={styles.storeSignature}>
-                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4 4 16.5Z" /><path d="m14.8 5.7 3.5 3.5" /></svg>
-                      <input value={storeSignature} onChange={(event) => setStoreSignature(event.target.value)} placeholder="Vaš potpis" maxLength={60} />
-                    </label>
+                    {showOfferingPreview ? (
+                      <div className={styles.storeOfferingMessage}>
+                        <p className={styles.storeOfferingProduct}>{storeSelectedProduct?.name}</p>
+                        <section>
+                          <h3>Uspomena ili posveta</h3>
+                          <blockquote>{storeDedication || "Uz ovaj poklon nije ostavljena posveta."}</blockquote>
+                        </section>
+                        <p className={styles.storeOfferingSignature}>
+                          <span>Potpis</span>
+                          <strong>{storeSignature || "Anonimno"}</strong>
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <label className={styles.storeDedication}>
+                          Uspomena ili posveta <span>Neobavezno</span>
+                          <textarea value={storeDedication} onChange={(event) => setStoreDedication(event.target.value)} placeholder="Uspomena na preminulog..." maxLength={180} />
+                          <small>{storeDedication.length}/180</small>
+                        </label>
+                        <label className={styles.storeSignature}>
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4 4 16.5Z" /><path d="m14.8 5.7 3.5 3.5" /></svg>
+                          <input value={storeSignature} onChange={(event) => setStoreSignature(event.target.value)} placeholder="Vaš potpis" maxLength={60} />
+                        </label>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -1881,11 +2235,36 @@ export default function Home() {
                 </div>
               )}
 
-              <div className={styles.storeActions}>
-                {storeStep > 0 && <button type="button" className={styles.storeBack} onClick={() => setStoreStep((current) => current - 1)}>← Nazad</button>}
-                <button type="button" className={styles.storeNext} onClick={advanceStore}>{storeStep === storeSteps.length - 1 ? "Sačuvaj izbor" : "Dalje"} <span>›</span></button>
+              <div className={styles.storeFooter}>
+                <p className={styles.storeDisclaimer}>
+                  {showOfferingPreview
+                    ? "Ovo su uspomena i potpis ostavljeni uz ovaj poklon."
+                    : "Ovo je probni prikaz prodavnice. Kupovina i plaćanje još nisu aktivni."}
+                </p>
+                <div className={styles.storeActions}>
+                  {showOfferingPreview ? (
+                    <button
+                      type="button"
+                      className={styles.storeNext}
+                      onClick={() => setShowOfferingPreview(false)}
+                    >
+                      {storeSelectedProduct?.category === "candles" ? "Zapali istu svijeću" : "Postavi isto cvijeće"} <span>›</span>
+                    </button>
+                  ) : (
+                    <>
+                      {storeStep > 0 && <button type="button" className={styles.storeBack} onClick={() => setStoreStep((current) => current - 1)}>← Nazad</button>}
+                      <button
+                        type="button"
+                        className={styles.storeNext}
+                        onClick={advanceStore}
+                        disabled={storeStep === storeSteps.length - 1 && !storeTermsAccepted}
+                      >
+                        {storeStep === storeSteps.length - 1 ? "Sačuvaj i plati" : "Dalje"} <span>›</span>
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-              <p className={styles.storeDisclaimer}>Ovo je probni prikaz prodavnice. Kupovina i plaćanje još nisu aktivni.</p>
             </div>
           </div>
           <button className={styles.storeClose} type="button" aria-label="Zatvori prodavnicu" onClick={() => setPanel(null)}>×</button>
@@ -2012,6 +2391,9 @@ export default function Home() {
                 <button className={styles.memorialCandleAction} type="button" onClick={() => openStoreFor(selected)}>
                   <span aria-hidden="true">＋</span> Upali svijeću
                 </button>
+                <button className={styles.memorialFlowerAction} type="button" onClick={() => openStoreFor(selected, undefined, "flowers")}>
+                  <span aria-hidden="true">✿</span> Postavi cvijeće
+                </button>
                 <button className={styles.memorialIconAction} type="button" aria-label="Podijeli uspomenu" onClick={() => void shareMemorial(selected)}>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="m8.7 10.7 6.6-4.4m-6.6 7 6.6 4.4" /></svg>
                 </button>
@@ -2114,7 +2496,10 @@ export default function Home() {
                   </div>
                   <div className={styles.memorialMemoryFooter}>
                     <span aria-live="polite">{formatCandleCount(selectedOfferingTotals?.candles ?? 0)} · {formatFlowerCount(selectedOfferingTotals?.flowers ?? 0)}</span>
-                    <button type="button" onClick={() => openStoreFor(selected)}>＋ Upali svijeću</button>
+                    <div className={styles.memorialOfferingActions}>
+                      <button type="button" onClick={() => openStoreFor(selected)}>＋ Upali svijeću</button>
+                      <button type="button" onClick={() => openStoreFor(selected, undefined, "flowers")}>✿ Postavi cvijeće</button>
+                    </div>
                   </div>
                 </section>
                 <small className={styles.memorialDisclaimer}>Demonstracioni pomen; sadržaj je privremen.</small>

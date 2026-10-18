@@ -6,8 +6,8 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function knownMemorial() {
-      return memorialId in ['1', '2', '3', '4', '5', '6'];
+    function knownMemorial(memorialId) {
+      return memorialId in ['1', '2', '3', '4', '5', '6', '7'];
     }
 
     function validCounts(data) {
@@ -20,10 +20,10 @@ service cloud.firestore {
     }
 
     match /memorialOfferings/{memorialId} {
-      allow get, list: if signedIn() && knownMemorial();
+      allow get, list: if signedIn() && knownMemorial(memorialId);
 
       allow create: if signedIn()
-        && knownMemorial()
+        && knownMemorial(memorialId)
         && validCounts(request.resource.data)
         && (
           (request.resource.data.candles == 1 && request.resource.data.flowers == 0)
@@ -31,7 +31,7 @@ service cloud.firestore {
         );
 
       allow update: if signedIn()
-        && knownMemorial()
+        && knownMemorial(memorialId)
         && validCounts(resource.data)
         && validCounts(request.resource.data)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['candles', 'flowers'])
@@ -50,10 +50,10 @@ service cloud.firestore {
     }
 
     match /memorialOfferings/{memorialId}/items/{itemId} {
-      allow get, list: if signedIn() && knownMemorial();
+      allow get, list: if signedIn() && knownMemorial(memorialId);
 
       allow create: if signedIn()
-        && knownMemorial()
+        && knownMemorial(memorialId)
         && request.resource.data.keys().hasAll(['productId', 'dedication', 'signature', 'createdAt'])
         && request.resource.data.keys().hasOnly(['productId', 'dedication', 'signature', 'createdAt'])
         && request.resource.data.productId is string
@@ -69,7 +69,7 @@ service cloud.firestore {
     }
 
     match /memorialGalleries/{memorialId} {
-      allow get: if signedIn() && knownMemorial();
+      allow get: if signedIn() && knownMemorial(memorialId);
       allow list, create, update, delete: if false;
     }
 

@@ -46,7 +46,8 @@
 }
 
 .scene_tabla .backdrop {
-  filter: saturate(.55) brightness(.59);
+  background-image: linear-gradient(rgba(9, 10, 10, .96), rgba(9, 10, 10, .96));
+  filter: none;
 }
 
 .time_day .backdrop {
@@ -427,6 +428,10 @@
 }
 
 .mobileSearch {
+  display: none;
+}
+
+.mobileSoundToggle {
   display: none;
 }
 
@@ -929,6 +934,41 @@
   pointer-events: auto;
 }
 
+.markerOfferingCandle::before,
+.markerOfferingCandle::after {
+  position: absolute;
+  z-index: 1;
+  top: 10%;
+  left: 50%;
+  content: "";
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+}
+
+.markerOfferingCandle::before {
+  width: 42px;
+  height: 46px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(255 247 190 / 96%) 0%, rgb(255 174 60 / 75%) 22%, rgb(255 94 14 / 42%) 48%, transparent 76%);
+  filter: blur(7px);
+  animation: candleAuraFlicker 1.65s ease-in-out infinite;
+}
+
+.markerOfferingCandle::after {
+  top: 8%;
+  width: 13px;
+  height: 23px;
+  border-radius: 50% 50% 48% 48%;
+  background: radial-gradient(ellipse at 50% 68%, #fffbe0 0%, #fff0a0 29%, #ffae32 56%, #ff5c13 76%, transparent 100%);
+  filter: blur(1px) drop-shadow(0 0 8px rgb(255 135 22 / 90%));
+  animation: candleFlameFlicker .82s ease-in-out infinite;
+}
+
+.markerOfferingCandle .markerOfferingImage {
+  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, .55)) drop-shadow(0 0 9px rgb(255 137 34 / 38%));
+}
+
 .markerOfferingButton:hover .markerOfferingImage {
   transform: scale(1.12);
 }
@@ -1022,58 +1062,305 @@
   font-size: 15px;
 }
 
-.noticeBoard {
-  display: grid;
-  width: min(670px, 88vw);
-  margin-top: 34px;
-  grid-template-columns: 1fr 1fr;
-  gap: 13px;
+.boardExploreView {
+  inset: 132px 5% 88px;
+  align-items: stretch;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 28px;
+  scrollbar-color: rgba(196, 155, 69, .55) transparent;
+  scrollbar-width: thin;
 }
 
-.noticeBoard article {
-  min-height: 130px;
-  padding: 18px;
-  border: 1px solid rgba(204, 173, 102, .44);
-  background: linear-gradient(145deg, rgba(25, 25, 21, .89), rgba(12, 14, 12, .88));
-  box-shadow: 0 12px 25px rgba(0, 0, 0, .22);
+.boardPageHeading {
+  flex: 0 0 auto;
+  margin-top: 0;
+  text-align: left;
 }
 
-.noticeBoard article span {
-  color: #d2b36b;
-  font-size: 8px;
-  letter-spacing: 1.5px;
-}
-
-.noticeBoard article h2 {
-  margin: 13px 0 7px;
-  color: #f5f0e2;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 19px;
-  font-weight: 400;
-}
-
-.noticeBoard article p {
-  margin: 0;
-  color: rgba(236, 231, 215, .67);
-  font-size: 10px;
-  line-height: 1.65;
-}
-
-.noticeBoard > button {
-  min-height: 43px;
-  grid-column: 1 / -1;
-  border: 1px solid rgba(196, 155, 69, .75);
-  color: #f5f0e3;
-  background: rgba(28, 34, 28, .88);
-  cursor: pointer;
-  font-size: 10px;
-  letter-spacing: 1px;
+.boardPageHeading h1 {
+  color: #e6c47f;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(19px, 1.8vw, 27px);
+  font-weight: 700;
+  letter-spacing: .02em;
   text-transform: uppercase;
 }
 
-.noticeBoard > button b {
-  margin-left: 13px;
-  color: var(--gold);
+.boardPageHeading p {
+  margin-top: 6px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.noticeBoard {
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  flex: 1 0 auto;
+  margin-top: 22px;
+  grid-template-columns: minmax(230px, .42fr) minmax(0, 1fr);
+  gap: clamp(18px, 2.2vw, 38px);
+}
+
+.boardMemorialCards {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: repeat(3, minmax(125px, 1fr));
+  gap: 18px;
+}
+
+.boardMemorialCard {
+  position: relative;
+  display: flex;
+  min-height: 125px;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 14px;
+  border: 1px solid rgba(222, 216, 199, .08);
+  color: rgba(245, 241, 230, .75);
+  background: #202020;
+  text-align: center;
+}
+
+.boardMemorialCard::before {
+  position: absolute;
+  inset: 8px;
+  border: 3px double rgba(5, 6, 6, .8);
+  content: "";
+  pointer-events: none;
+}
+
+.boardMemorialCard p,
+.boardMemorialCard span,
+.boardMemorialCard h2,
+.boardMemorialCard small {
+  position: relative;
+  z-index: 1;
+}
+
+.boardMemorialCard p {
+  margin: 0 0 5px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.boardMemorialCard span,
+.boardMemorialCard small {
+  color: rgba(238, 234, 224, .52);
+  font-size: 10px;
+}
+
+.boardMemorialCard h2 {
+  margin: 12px 0;
+  color: #f5f2e9;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.boardDirectory {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.boardControls {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: clamp(10px, 1.6vw, 25px);
+  margin-bottom: 12px;
+}
+
+.boardPageSize {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 9px;
+  color: rgba(238, 234, 224, .5);
+  font-size: 12px;
+}
+
+.boardPageSize select {
+  border: 0;
+  color: #d7a20f;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.boardPageSize option {
+  color: #eee;
+  background: #171717;
+}
+
+.boardSearch {
+  display: flex;
+  min-width: 100px;
+  flex: 1 1 auto;
+  align-items: center;
+  border-bottom: 2px solid rgba(238, 234, 224, .65);
+  color: #d7a20f;
+}
+
+.boardSearch input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  border: 0;
+  outline: 0;
+  color: #f3efe5;
+  background: transparent;
+  font-size: 14px;
+}
+
+.boardSearch input::placeholder {
+  color: rgba(238, 234, 224, .64);
+}
+
+.boardSearch input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.boardSearch > span:last-child {
+  padding: 0 8px;
+  font-size: 24px;
+}
+
+.boardAddButton {
+  min-height: 38px;
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 1px solid #aa8019;
+  border-radius: 4px;
+  color: #e4bd58;
+  background: rgba(13, 13, 13, .7);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.boardAddButton:hover {
+  background: rgba(196, 155, 69, .13);
+}
+
+.boardTableWrap {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-color: rgba(196, 155, 69, .45) transparent;
+  scrollbar-width: thin;
+}
+
+.boardTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+}
+
+.boardTable th,
+.boardTable td {
+  padding: 9px clamp(5px, 1.1vw, 17px);
+  overflow-wrap: anywhere;
+}
+
+.boardTable th {
+  color: #f2efe7;
+  background: rgba(12, 12, 12, .82);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.boardTable td {
+  border-bottom: 1px solid rgba(238, 234, 224, .09);
+  color: rgba(241, 238, 230, .76);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.boardTable tbody tr:hover {
+  background: rgba(233, 199, 116, .045);
+}
+
+.boardTable th:nth-child(1) { width: 17%; }
+.boardTable th:nth-child(2) { width: 19%; }
+.boardTable th:nth-child(3),
+.boardTable th:nth-child(4) { width: 14%; }
+.boardTable th:nth-child(5) { width: 17%; }
+.boardTable th:nth-child(6) { width: 10%; text-align: center; }
+
+.boardTable td:nth-child(6) {
+  text-align: center;
+}
+
+.boardGraveNumber {
+  color: #bc974b !important;
+}
+
+.boardShowButton {
+  display: inline-grid;
+  width: 34px;
+  height: 36px;
+  place-items: center;
+  border: 0;
+  color: #bc974b;
+  background: transparent;
+  cursor: pointer;
+}
+
+.boardShowButton:hover {
+  color: #f0c958;
+}
+
+.boardShowButton svg {
+  width: 22px;
+  height: 27px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.2;
+}
+
+.boardEmpty {
+  padding: 28px 12px !important;
+  color: rgba(238, 234, 224, .5) !important;
+  text-align: center;
+}
+
+.boardPagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  color: rgba(238, 234, 224, .52);
+  font-size: 10px;
+}
+
+.boardPagination > div {
+  display: flex;
+  gap: 7px;
+}
+
+.boardPagination button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(196, 155, 69, .35);
+  color: #e1c374;
+  background: rgba(12, 12, 12, .7);
+  cursor: pointer;
+  font-size: 9px;
+}
+
+.boardPagination button:disabled {
+  color: rgba(238, 234, 224, .27);
+  cursor: not-allowed;
 }
 
 .backToGate {
@@ -1681,13 +1968,13 @@
   color: #eee;
   background: #111113;
   scrollbar-color: #4c4c50 #171719;
-  animation: contentAppear .2s ease-out both;
+  animation: storePageFade .2s ease-out both;
 }
 
 .storeContent {
   width: min(1440px, calc(100% - 88px));
   margin: 0 auto;
-  padding: 30px 0 28px;
+  padding: 30px 0 124px;
 }
 
 .storeTopline {
@@ -2197,7 +2484,7 @@
 
 .storeMemorialFigure {
   position: relative;
-  height: clamp(280px, 49vh, 490px);
+  height: clamp(340px, 58vh, 560px);
   overflow: hidden;
   margin: 0;
   background:
@@ -2207,10 +2494,10 @@
 
 .storeMemorialArtwork {
   position: absolute;
-  bottom: 3%;
+  bottom: 0;
   left: 50%;
   width: min(90%, 370px);
-  height: 97%;
+  height: 100%;
   border: 0;
   background: transparent;
   transform: translateX(-50%);
@@ -2220,9 +2507,74 @@
   object-fit: contain;
 }
 
+.storeOfferingPreview {
+  position: absolute;
+  z-index: 1;
+  bottom: 5%;
+  left: 66%;
+  width: clamp(72px, 11vw, 132px);
+  height: clamp(72px, 11vw, 132px);
+  object-fit: contain;
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, .6));
+  transform: translateX(-50%);
+}
+
 .storeMemoryForm {
   display: grid;
   gap: 25px;
+}
+
+.storeOfferingMessage {
+  display: grid;
+  align-content: start;
+  gap: 24px;
+}
+
+.storeOfferingProduct {
+  margin: 0;
+  color: #d8b95f;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.storeOfferingMessage section {
+  border-left: 2px solid #c69b26;
+  padding: 4px 0 4px 18px;
+}
+
+.storeOfferingMessage h3 {
+  margin: 0 0 14px;
+  color: #eee;
+  font-size: 14px;
+}
+
+.storeOfferingMessage blockquote {
+  margin: 0;
+  color: #ddd;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(18px, 2vw, 27px);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.storeOfferingSignature {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+  margin: 0;
+  padding-top: 14px;
+  border-top: 1px solid #37373b;
+}
+
+.storeOfferingSignature span {
+  color: #929297;
+  font-size: 11px;
+}
+
+.storeOfferingSignature strong {
+  color: #e8d7a7;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .storeMemoryForm .storeDedication {
@@ -2337,12 +2689,29 @@
   color: #e36b52;
 }
 
+.storeFooter {
+  position: fixed;
+  z-index: 5;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px max(22px, calc((100vw - 1400px) / 2)) calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(213, 165, 31, .2);
+  background: rgba(17, 17, 19, .97);
+  backdrop-filter: blur(12px);
+}
+
 .storeActions {
   display: flex;
   min-height: 46px;
-  justify-content: space-between;
+  flex: 0 0 auto;
+  justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
+  margin: 0;
 }
 
 .storeActions button {
@@ -2374,6 +2743,17 @@
   background: #e7b422;
 }
 
+.storeNext:disabled {
+  border-color: #29292c;
+  color: #77777b;
+  background: #252528;
+  cursor: not-allowed;
+}
+
+.storeNext:disabled:hover {
+  background: #252528;
+}
+
 .storeNext span {
   font-size: 21px;
   font-weight: 400;
@@ -2381,10 +2761,10 @@
 }
 
 .storeDisclaimer {
-  margin: 14px 0 0;
+  margin: 0;
   color: #77777c;
   font-size: 10px;
-  text-align: right;
+  text-align: left;
 }
 
 .storeClose {
@@ -2468,6 +2848,7 @@
 }
 
 .memorialCandleAction,
+.memorialFlowerAction,
 .memorialIconAction {
   display: inline-flex;
   height: 44px;
@@ -2489,6 +2870,28 @@
   font-weight: 700;
   letter-spacing: .7px;
   text-transform: uppercase;
+}
+
+.memorialFlowerAction {
+  gap: 9px;
+  padding: 0 16px;
+  border-radius: 24px;
+  color: #f3d992;
+  background: rgba(35, 31, 21, .88);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .45px;
+  text-transform: uppercase;
+}
+
+.memorialFlowerAction:hover {
+  background: rgba(217, 154, 18, .2);
+}
+
+.memorialFlowerAction span {
+  color: #e8bd68;
+  font-size: 19px;
+  line-height: 1;
 }
 
 .memorialCandleAction:hover {
@@ -2808,6 +3211,13 @@
   padding: 12px;
   color: rgba(255, 255, 255, .63);
   font-size: 12px;
+}
+
+.memorialOfferingActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .memorialMemoryFooter button {
@@ -3211,6 +3621,11 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes storePageFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes candleAuraFlicker {
   0%, 100% { opacity: .76; transform: translate(-50%, -50%) scale(.96, .94); }
   9% { opacity: .9; transform: translate(-50%, -50%) scale(1.02, 1.08); }
@@ -3288,7 +3703,7 @@
 
   .header {
     width: calc(100% - 42px);
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 210px minmax(0, 1fr);
   }
 
   .brandMark {
@@ -3302,21 +3717,57 @@
   }
 
   .utilityNav {
-    gap: 15px;
+    gap: 12px;
   }
 
   .utilityNav .newMemorial {
-    min-width: 170px;
+    min-width: 145px;
+  }
+
+  .utilityNav button,
+  .iconNav button,
+  .placeNav button {
+    font-size: 10px;
+    letter-spacing: .8px;
   }
 
   .iconNav {
-    gap: 11px;
-    padding-left: 12px;
+    gap: 8px;
+    padding-left: 9px;
   }
 
   .placeNav,
   .navItem {
     gap: 13px;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 701px) {
+  .storeProducts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .storeCatalog {
+    grid-template-columns: 170px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .memorialDialog {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+
+  .memorialDialogHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px 0 14px;
+  }
+
+  .memorialDialogActions {
+    width: 100%;
+    justify-content: flex-end;
   }
 }
 
@@ -3466,7 +3917,7 @@
 
   .storeContent {
     width: calc(100% - 30px);
-    padding: 22px 0 22px;
+    padding: 22px 0 112px;
   }
 
   .storeTopline {
@@ -3551,7 +4002,12 @@
   }
 
   .storeMemorialFigure {
-    height: 280px;
+    height: clamp(340px, 52vh, 440px);
+  }
+
+  .storeOfferingPreview {
+    width: 92px;
+    height: 92px;
   }
 
   .storeMemoryForm {
@@ -3586,15 +4042,34 @@
   }
 
   .storeActions {
-    margin-top: 20px;
+    min-height: 40px;
+    gap: 8px;
   }
 
   .storeActions button {
     min-width: 100px;
   }
 
+  .storeFooter {
+    gap: 8px;
+    padding: 8px 15px calc(8px + env(safe-area-inset-bottom));
+  }
+
   .storeDisclaimer {
+    max-width: 34%;
+    font-size: 8px;
+    line-height: 1.4;
     text-align: left;
+  }
+
+  .storeActions {
+    gap: 6px;
+  }
+
+  .storeActions button {
+    min-width: 80px;
+    padding: 0 10px;
+    font-size: 9px;
   }
 
   .storeClose {
@@ -3755,6 +4230,31 @@
     letter-spacing: .35px;
   }
 
+  .placeNav .mobileSoundToggle {
+    display: grid;
+    width: 31px;
+    height: 31px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(238, 235, 224, .4);
+    border-radius: 50%;
+    color: #d5a529;
+  }
+
+  .placeNav .mobileSoundToggle::after {
+    display: none;
+  }
+
+  .mobileSoundToggle svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+  }
+
   .separator {
     font-size: 13px;
   }
@@ -3894,6 +4394,16 @@
     height: 62px;
   }
 
+  .markerOfferingCandle::before {
+    width: 36px;
+    height: 40px;
+  }
+
+  .markerOfferingCandle::after {
+    width: 11px;
+    height: 20px;
+  }
+
   .graveyardArrow {
     top: 60%;
     width: 36px;
@@ -3921,24 +4431,84 @@
     font-size: 8px;
   }
 
+  .boardExploreView {
+    inset: 122px 4% 92px;
+  }
+
+  .boardPageHeading {
+    margin-top: 0;
+  }
+
+  .boardPageHeading h1 {
+    font-size: clamp(16px, 3.5vw, 22px);
+  }
+
   .noticeBoard {
     grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .boardMemorialCards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto;
     gap: 8px;
-    margin-top: 22px;
   }
 
-  .noticeBoard article {
-    min-height: 100px;
-    padding: 13px;
+  .boardMemorialCard {
+    min-height: 116px;
+    padding: 14px 8px;
   }
 
-  .noticeBoard article h2 {
-    margin: 8px 0 5px;
-    font-size: 16px;
+  .boardMemorialCard p {
+    font-size: 9px;
   }
 
-  .noticeBoard > button {
-    min-height: 38px;
+  .boardMemorialCard h2 {
+    margin: 8px 0;
+    font-size: 12px;
+  }
+
+  .boardMemorialCard span,
+  .boardMemorialCard small {
+    font-size: 8px;
+  }
+
+  .boardControls {
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    margin-bottom: 8px;
+  }
+
+  .boardSearch {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .boardSearch input {
+    height: 36px;
+    font-size: 12px;
+  }
+
+  .boardAddButton {
+    min-height: 34px;
+    margin-left: auto;
+    padding: 0 10px;
+    font-size: 8px;
+  }
+
+  .boardTable {
+    min-width: 640px;
+  }
+
+  .boardTable th,
+  .boardTable td {
+    padding: 8px 10px;
+    font-size: 10px;
+  }
+
+  .boardPagination {
+    padding: 9px 0;
   }
 
   .backToGate {
@@ -3963,20 +4533,45 @@
 
   .memorialDialogActions {
     width: 100%;
+    flex-wrap: wrap;
     justify-content: flex-end;
+    gap: 6px;
   }
 
   .memorialCandleAction {
     height: 40px;
-    margin-right: auto;
-    padding: 0 16px;
-    font-size: 9px;
+    min-width: 0;
+    flex: 1 1 40%;
+    margin-right: 0;
+    gap: 6px;
+    padding: 0 9px;
+    font-size: 8px;
+    letter-spacing: .2px;
+  }
+
+  .memorialFlowerAction {
+    height: 40px;
+    min-width: 0;
+    flex: 1 1 40%;
+    gap: 5px;
+    padding: 0 9px;
+    font-size: 8px;
+    letter-spacing: .1px;
   }
 
   .memorialIconAction {
     width: 40px;
     height: 40px;
     flex-basis: 40px;
+  }
+
+  .memorialMemoryFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .memorialOfferingActions {
+    width: 100%;
   }
 
   .memorialDialogContent {
@@ -4070,6 +4665,221 @@
   .settingOption svg {
     width: 46px;
     height: 46px;
+  }
+}
+
+@media (max-width: 480px) {
+  .storeTopline {
+    margin-top: 16px;
+    gap: 15px;
+  }
+
+  .storeSteps button {
+    font-size: 8px;
+  }
+
+  .storeFooter {
+    align-items: center;
+    gap: 8px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .storeDisclaimer {
+    max-width: none;
+    flex: 1 1 0;
+    font-size: 8px;
+  }
+
+  .storeActions {
+    width: 62%;
+    min-width: 0;
+    gap: 5px;
+  }
+
+  .storeActions button {
+    min-width: 0;
+    flex: 1 1 0;
+    padding: 0 5px;
+    font-size: 8px;
+    letter-spacing: .15px;
+    white-space: nowrap;
+  }
+
+  .storeNext {
+    gap: 4px;
+  }
+
+  .storeContent {
+    width: calc(100% - 22px);
+    padding-bottom: 108px;
+  }
+
+  .storeProducts {
+    gap: 8px;
+  }
+
+  .productDetails {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .productDetails b {
+    font-size: 10px;
+  }
+
+  .productDetails small,
+  .productDetails em {
+    font-size: 8px;
+  }
+
+  .productCredit {
+    padding-right: 5px;
+    padding-left: 5px;
+    font-size: 8px;
+  }
+
+  .exploreTopline {
+    gap: 10px;
+  }
+
+  .exploreHeading h1 {
+    font-size: clamp(30px, 9vw, 40px);
+  }
+
+  .boardPageHeading h1 {
+    font-size: 18px;
+  }
+
+  .exploreHeading p {
+    font-size: 11px;
+  }
+
+  .graveyardToolbar {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .graveyardToolbar select {
+    max-width: 55vw;
+  }
+
+  .memorialDialog {
+    padding: 10px 12px 24px;
+  }
+
+  .memorialIdentity h2 {
+    font-size: 18px;
+  }
+
+  .memorialIdentity p {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .memorialCandleAction,
+  .memorialFlowerAction {
+    font-size: 7px;
+  }
+
+  .memorialIconAction {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+  }
+
+  .memorialGalleryHeading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .memorialGalleryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .memorialOfferingEntry {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .memorialOfferingEntry > img {
+    height: 72px;
+  }
+}
+
+@media (max-width: 700px) and (max-height: 520px) {
+  .header {
+    top: 5px;
+    grid-template-rows: 48px 39px;
+  }
+
+  .brandMark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .brandMark svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .brandText strong {
+    font-size: 15px;
+  }
+
+  .placeNav button {
+    padding: 6px 0;
+  }
+
+  .exploreView {
+    inset: 100px 4% 60px;
+  }
+
+  .exploreTopline {
+    margin-top: 0;
+  }
+
+  .exploreHeading h1 {
+    font-size: 28px;
+  }
+
+  .exploreHeading p {
+    margin-top: 5px;
+    font-size: 10px;
+  }
+
+  .graveyard {
+    height: 40svh;
+    min-height: 155px;
+    margin-top: 1vh;
+  }
+
+  .graveMarker {
+    min-height: 175px;
+  }
+
+  .markerStone {
+    width: 105px;
+    height: 150px;
+  }
+
+  .markerOfferings {
+    height: 60px;
+  }
+
+  .markerOfferingButton,
+  .markerOfferingImage {
+    width: 42px;
+    height: 50px;
+  }
+
+  .footer {
+    min-height: 55px;
+    padding-bottom: 6px;
+  }
+
+  .photoCredits {
+    display: none;
   }
 }
 

@@ -22,10 +22,14 @@ The cemetery's candle and flower totals are stored in Cloud Firestore and update
 
 1. In Firebase Console, enable **Authentication → Sign-in method → Anonymous**. Visitors are signed in automatically; they do not create or manage accounts.
 2. Copy the Firebase web-app settings from `.env.example` into `.env.local` and fill in the values from **Project settings → Your apps**. Never commit `.env.local`.
-3. In **Firestore Database → Rules**, publish the rules from [`firestore.rules`](./firestore.rules). The app can only read the six sample memorial counters, increment one counter by one per write, create immutable offering entries with the selected product, dedication, signature, and timestamp, and read gallery metadata.
+3. In **Firestore Database → Rules**, publish the rules from [`firestore.rules`](./firestore.rules). The app can only read the seven sample memorial counters, increment one counter by one per write, create immutable offering entries with the selected product, dedication, signature, and timestamp, and read gallery metadata.
 4. Restart the development server after changing environment variables.
 
-The current six sample memorials are defined in the app; Firestore stores their additional candle and flower totals in `memorialOfferings/{memorialId}` documents. Individual gifts and their dedications/signatures are stored in the `memorialOfferings/{memorialId}/items/{itemId}` subcollection. Gallery images are resized to a maximum 1200 px and compressed to WebP (maximum 1 MB) before being uploaded to Cloudflare R2. Firestore stores only each image's public URL and metadata, allows up to ten photos per memorial, and the interface shows up to six. Anonymous Authentication is required to read galleries and upload images.
+The current seven sample memorials are defined in the app; Firestore stores their additional candle and flower totals in `memorialOfferings/{memorialId}` documents. Individual gifts and their dedications/signatures are stored in the `memorialOfferings/{memorialId}/items/{itemId}` subcollection. Gallery images are resized to a maximum 1200 px and compressed to WebP (maximum 1 MB) before being uploaded to Cloudflare R2. Firestore stores only each image's public URL and metadata, allows up to ten photos per memorial, and the interface shows up to six. Anonymous Authentication is required to read galleries and upload images. The seventh sample memorial starts with no candles or flowers for testing the gift flow.
+
+You do not need to create the `memorialOfferings` collection or its `items` subcollections manually. Firestore creates them on the first successful gift save; until then, missing documents and empty subcollections are expected. If the app reports `permission-denied`, enable Anonymous sign-in and publish `firestore.rules` to the same Firebase project configured in `.env.local`, then reload the app. The `memorialGalleries` document is created by the first successful gallery upload.
+
+The optional ambient soundtrack is generated in the browser with the Web Audio API as softly decaying piano notes with a subtle filtered nature ambience and occasional bird-like chirps; it starts only after the visitor selects the sound button and can be muted there at any time.
 
 ### Cloudflare R2 gallery setup
 

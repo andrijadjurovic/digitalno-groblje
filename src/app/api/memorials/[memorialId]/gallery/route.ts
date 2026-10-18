@@ -4,7 +4,7 @@ import { getFirebaseAdminServices } from "../../../../../lib/firebase-admin";
 import { getR2Services } from "../../../../../lib/r2";
 
 const maxImageSize = 1_000_000;
-const validMemorialIds = new Set(["1", "2", "3", "4", "5", "6"]);
+const validMemorialIds = new Set(["1", "2", "3", "4", "5", "6", "7"]);
 
 type StoredPhoto = {
   id: string;
